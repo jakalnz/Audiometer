@@ -15,6 +15,8 @@
     #background_color: (1, 1, 1, 1) #a nice white background that hides my image
     background_color: (0, 0, 0, 0) #a nice white background that hides my image
     text:"one"
+    color:0,0,0,0 #made opacity 0 so cant interfere with grid lines may look to doing button behaviour
+
     size_hint:(1,1)
     on_press: self.changeImage() #WORKS!
 
@@ -71,7 +73,7 @@
             pos:self.pos[0],self.pos[1]
             size:self.width,self.height-self.height/26
 
-    canvas.after:
+    canvas:
 
         Color:
             rgb: 0, 0, 0
@@ -243,7 +245,7 @@
             pos:self.pos[0],self.pos[1]
             size:self.width,self.height-self.height/26
 
-    canvas.after:
+    canvas:
         Color:
             rgb: 0, 0, 0
         Rectangle:
