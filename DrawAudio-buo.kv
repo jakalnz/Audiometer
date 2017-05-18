@@ -1,0 +1,292 @@
+#:kivy 1.9.1
+
+#even = InstructionGroup():
+#even.add
+#
+#blue.add(Color(0, 0, 1, 0.2))
+#blue.add(Rectangle(pos=self.pos, size=(100, 100)))
+#audio "button" is a  rectangle with 3 grids (left, right, centre)
+#for holding AG symbols
+<AudioButton@Button>
+    background_normal: ('')
+    background_color: (1, 1, 1, 1)
+    text:"one"
+    size_hint:(1,1)
+#    canvas.after:
+#
+#        Color:
+#            rgb: 0, 0, 0
+#        Rectangle:
+#            #background_color:(0,0,0,1)
+#            pos: self.center_x - 1, 0
+#            size: 2, self.height
+#        Rectangle:
+#            pos: 0, self.center_y - 1
+#            size: self.width, 2
+
+   # Button:
+
+
+
+
+
+<FrequencyColumn>
+
+    canvas.after:
+        Color:
+            rgb: 0, 0, 0
+        Rectangle:
+            #background_color:(0,0,0,1)
+            pos: self.center_x - 1, (self.height/26)/2 - 0
+            size: 2, self.height - 4*(self.height/26)/2 - 0
+#        Rectangle:
+#            pos: 0, self.center_y - 1
+#            size: self.width, 2
+        Rectangle:
+            pos: 0, (self.height/26)/2 - 0
+            size: self.width, 1
+        Rectangle:
+            pos: 0, 5*(self.height/26)/2 - 0
+            size: self.width, 1
+        Rectangle:
+            pos: 0, 9*(self.height/26)/2 - 0
+            size: self.width, 1
+        Rectangle:
+            pos: 0, 13*(self.height/26)/2 - 0
+            size: self.width, 1
+        Rectangle:
+            pos: 0, 17*(self.height/26)/2 - 0
+            size: self.width, 1
+        Rectangle:
+            pos: 0, 21*(self.height/26)/2 - 0
+            size: self.width, 1
+        Rectangle:
+            pos: 0, 25*(self.height/26)/2 - 0
+            size: self.width, 1
+        Rectangle:
+            pos: 0, 29*(self.height/26)/2 - 0
+            size: self.width, 1
+        Rectangle:
+            pos: 0, 33*(self.height/26)/2 - 0
+            size: self.width, 1
+        Rectangle:
+            pos: 0, 37*(self.height/26)/2 - 0
+            size: self.width, 1
+        Rectangle:
+            pos: 0, 41*(self.height/26)/2 - 0
+            size: self.width, 1
+        Rectangle:
+            pos: 0, 45*(self.height/26)/2 - 0
+            size: self.width, 1
+        Rectangle:
+            pos: 0, 49*(self.height/26)/2 - 0
+            size: self.width, 1
+
+#    canvas.before:
+#        Color:
+#            rgb:1,1,1
+#        Rectangle:
+##            pos: self.pos
+#            size: self.size
+
+    GridLayout:
+        #size_hint:(1,1)
+	    #background_normal: ('')
+	    #background_color:(1, 1, 1, 1)
+	    cols: 1
+        Label:
+            id:freq
+            #color:(0, 0, 0, 0)
+            text:"250Hz"
+            color:0,0,0,1
+#            canvas.before:
+#                Color:
+#                    rgba: 1,1,1,1
+#                Rectangle:
+#                    pos:self.pos
+#                    size: self.size
+            #size_hint:(1,1)
+
+	    AudioButton:
+            id: but-10
+            text:"-10"
+	    AudioButton:
+	        id:but-5
+	        text:"-5"
+	    AudioButton:
+	        id:but0
+	        text:"0"
+	    AudioButton:
+            id: but5
+            text:"5"
+	    AudioButton:
+	        id:but10
+	        text:"10"
+	    AudioButton:
+	        id:but15
+	        text:"15"
+	    AudioButton:
+	        id:but20
+	        text:"20"
+        AudioButton:
+	        id:but25
+	        text:"25"
+	    AudioButton:
+            id: but30
+            text:"30"
+	    AudioButton:
+	        id:but35
+	        text:"35"
+	    AudioButton:
+	        id:but40
+	        text:"40"
+	    AudioButton:
+	        id:but45
+	        text:"45"
+        AudioButton:
+	        id:but50
+	        text:"50"
+	    AudioButton:
+            id:but55
+            text:"55"
+        AudioButton:
+	        id:but60
+	        text:"60"
+	    AudioButton:
+            id:but65
+            text:"65"
+        AudioButton:
+	        id:but70
+	        text:"70"
+	    AudioButton:
+            id:but75
+            text:"75"
+        AudioButton:
+	        id:but80
+	        text:"80"
+	    AudioButton:
+            id:but85
+            text:"85"
+        AudioButton:
+	        id:but90
+	        text:"90"
+	    AudioButton:
+            id:but95
+            text:"95"
+        AudioButton:
+	        id:but100
+	        text:"100"
+	    AudioButton:
+            id:but105
+            text:"105"
+        AudioButton:
+	        id:but110
+	        text:"110"
+
+#DrawAudio:
+   # Canvas:
+        #Rectangle
+           # Color:(151,23,186.0,1)
+#Draw:
+
+<LevelColumn@Label>
+    GridLayout:
+        size_hint:(1,1)
+	    cols: 1
+        Label:
+            text:""
+            color:0,0,0,1
+        Label:
+            text:"-10"
+            color:0,0,0,1
+        Label:
+            text:"-5"
+            color:0,0,0,1
+        Label:
+            text:"0"
+            color:0,0,0,1
+        Label:
+            text:"5"
+            color:0,0,0,1
+        Label:
+            text:"10"
+            color:0,0,0,1
+        Label:
+            text:"15"
+            color:0,0,0,1
+        Label:
+            text:"20"
+            color:0,0,0,1
+        Label:
+            text:"25"
+            color:0,0,0,1
+        Label:
+            text:"30"
+            color:0,0,0,1
+        Label:
+            text:"35"
+            color:0,0,0,1
+        Label:
+            text:"40"
+            color:0,0,0,1
+        Label:
+            text:"45"
+            color:0,0,0,1
+        Label:
+            text:"50"
+            color:0,0,0,1
+        Label:
+            text:"55"
+            color:0,0,0,1
+        Label:
+            text:"60"
+            color:0,0,0,1
+        Label:
+            text:"65"
+            color:0,0,0,1
+        Label:
+            text:"70"
+            color:0,0,0,1
+        Label:
+            text:"75"
+            color:0,0,0,1
+        Label:
+            text:"80"
+            color:0,0,0,1
+        Label:
+            text:"85"
+            color:0,0,0,1
+        Label:
+            text:"90"
+            color:0,0,0,1
+        Label:
+            text:"95"
+            color:0,0,0,1
+        Label:
+            text:"100"
+            color:0,0,0,1
+        Label:
+            text:"105"
+            color:0,0,0,1
+        Label:
+            text:"110"
+            color:0,0,0,1
+
+
+<AudiogramW>:
+    GridLayout:
+        size: root.size
+	    rows: 1
+	    LevelColumn:
+
+        FrequencyColumn:
+
+        FrequencyColumn:
+
+        FrequencyColumn:
+
+
+
+
+
+
