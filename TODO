@@ -1,0 +1,3 @@
+get input from controller to choose where in audio button symbol goes based on AC, LAC, RBC
+code symbol info into button to allow updating of image rather than overwite for AC
+make imported symbols look less ugly

@@ -12,17 +12,18 @@
 
 
     background_normal: ('')
-    background_color: (1, 1, 1, 1)
+    #background_color: (1, 1, 1, 1) #a nice white background that hides my image
+    background_color: (0, 0, 0, 0) #a nice white background that hides my image
     text:"one"
     size_hint:(1,1)
     on_press: self.changeImage() #WORKS!
 
 #    canvas:
-#
+##
 #        Color:
 #            rgba:(0,1,1,0)
 #        Rectangle:
-#
+##
 #            pos: (self.center_x-self.height/2,self.center_y-self.height/2)
 #
 #            size:self.height,self.height
@@ -31,18 +32,19 @@
     Image:
 
         id:airconduction
-        source:'EMPTY.png'
-        x: self.parent.center_x-self.parent.height/2
-        y: self.parent.center_y-self.parent.height/2
-        size:self.parent.height,self.parent.height
+        source:'Icons/EMPTY.png'
+        x: self.parent.center_x-1.5*self.parent.height/2
+        y: self.parent.center_y-1.5*self.parent.height/2
+        size:1.5*self.parent.height,1.5*self.parent.height
         #texture: makeTexture('RAC.png', 'LAC.png')
+        mipmap: root.mipmap
 
 <OctaveAudioButton@AudioButton>
     rightboneconduction:rightboneconduction
     leftboneconduction:leftboneconduction
     Image:
         id:rightboneconduction
-        source:'EMPTY.png'
+        source:'Icons/EMPTY.png'
         x:self.parent.center_x-3*self.parent.height/2
         y:self.parent.center_y-self.parent.height/2
         size:self.parent.height,self.parent.height
@@ -50,7 +52,7 @@
 
     Image:
         id:leftboneconduction
-        source:'EMPTY.png'
+        source:'Icons/EMPTY.png'
         x:self.parent.center_x+self.parent.height/2
         y:self.parent.center_y-self.parent.height/2
         size:self.parent.height,self.parent.height
@@ -62,6 +64,13 @@
 
 #draw grid onto canvas
     frequencyLabel:""
+    canvas.before:
+        Color:
+            rgb: 1,1,1
+        Rectangle
+            pos:self.pos[0],self.pos[1]
+            size:self.width,self.height-self.height/26
+
     canvas.after:
 
         Color:
@@ -227,7 +236,12 @@
 
 #Layout for Half Freq - removes 1pt blackline
 <HalfFrequencyColumn>
-
+    canvas.before:
+        Color:
+            rgb: 1,1,1
+        Rectangle
+            pos:self.pos[0],self.pos[1]
+            size:self.width,self.height-self.height/26
 
     canvas.after:
         Color:
@@ -627,7 +641,7 @@
                     Rectangle:
                         size:self.size
                         pos:self.pos
-                        source:'RAC.png'
+                        source:'Icons/RAC.png'
             ToggleButton
                 id:la-
                 group:type
@@ -636,7 +650,7 @@
                     Rectangle:
                         size:self.size
                         pos:self.pos
-                        source:'LAC.png'
+                        source:'Icons/LAC.png'
             ToggleButton
                 id:ram
                 group:type
@@ -645,7 +659,7 @@
                     Rectangle:
                         size:self.size
                         pos:self.pos
-                        source:'M-RAC.png'
+                        source:'Icons/M-RAC.png'
             ToggleButton
                 id:lam
                 group:type
@@ -654,7 +668,8 @@
                     Rectangle:
                         size:self.size
                         pos:self.pos
-                        source:'M-LAC.png'
+                        source:'Icons/M-LAC.png'
+
             ToggleButton
                 id:rb-
                 group:type
@@ -663,7 +678,7 @@
                     Rectangle:
                         size:self.size
                         pos:self.pos
-                        source:'RBC.png'
+                        source:'Icons/RBC.png'
             ToggleButton
                 id:lb-
                 group:type
@@ -672,7 +687,7 @@
                     Rectangle:
                         size:self.size
                         pos:self.pos
-                        source:'LBC.png'
+                        source:'Icons/LBC.png'
             ToggleButton
                 id:rbm
                 group:type
@@ -681,7 +696,7 @@
                     Rectangle:
                         size:self.size
                         pos:self.pos
-                        source:'M-RBC.png'
+                        source:'Icons/M-RBC.png'
             ToggleButton
                 id:lbm
                 group:type
@@ -690,7 +705,8 @@
                     Rectangle:
                         size:self.size
                         pos:self.pos
-                        source:'M-LBC.png'
+                        source:'Icons/M-LBC.png'
+
         Label:
             text:"Modifiers"
             size_hint_y:.1

@@ -3,18 +3,23 @@
 # ill need 250,500,750,1000,2000,3000,4000,6000,8000 (9 buttons) by
 # (-10,-5,0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,105,110) (25 buttons)
 
+from itertools import izip as zip
+
 # create an audiogram widget with 9 frequency children [propery] each frequency child to have 25 buttons [property]
 # from PIL import Image
 # create an audiogram widget with 9 frequency children [propery] each frequency child to have 25 buttons [property]
 # from PIL import Image
 from kivy.app import App
 from kivy.core.image import Image
+# from kivy.graphics.instructions import InstructionGroup
 from kivy.core.window import Window
 from kivy.graphics.texture import Texture
 from kivy.properties import ObjectProperty, DictProperty, NumericProperty, StringProperty, ListProperty
 from kivy.uix.button import Button
 from kivy.uix.tabbedpanel import TabbedPanel
 from kivy.uix.widget import Widget
+
+get_indexes = lambda x, xs: [i for (y, i) in zip(xs, range(len(xs))) if x == y]
 
 # from kivy.input import MotionEvent
 Window.clearcolor = (1, 1, 1, 1)
@@ -52,6 +57,7 @@ class AudioButton(Button):
     airconduction = ObjectProperty(None)
     rightboneconduction = ObjectProperty(None)
     leftboneconduction = ObjectProperty(None)
+    mipmap = True
     # ctex = ObjectProperty(None)
     # ltex = ObjectProperty(None)
     # rtex = ObjectProperty(None)
@@ -63,6 +69,9 @@ class AudioButton(Button):
 
     # create a method that on click reports position of button, gives level, gets frequencycolumn label
     def changeImage(self):
+        currentSymbol = App.get_running_app().controllerOutput
+
+        # if
         self.airconduction.source = 'Images/' + ''.join(App.get_running_app().controllerOutput) + '.png'
 
         #
@@ -106,11 +115,22 @@ class AudioButton(Button):
     def on_touch_down(self, touch):
         if self.collide_point(*touch.pos) and touch.is_double_tap == False:
             # self.airconduction.source = 'RED.png'
+            # blue = InstructionGroup()
+            # blue.add(Color(0, 0, 1, 0.2))
+            # blue.add(Rectangle(pos=self.pos, size=(100, 100)))
+            #
+            # green = InstructionGroup()
+            # green.add(Color(0, 1, 0, 0.4))
+            # green.add(Rectangle(pos=(100, 100), size=(100, 100)))
+
+            # with self.parent.canvas:
+            #      add.Rectangle(source = 'Images/' + ''.join(App.get_running_app().controllerOutput) + '.png', pos=[self.parent.center_x-1.5*self.parent.height/2, self.parent.center_y-1.5*self.parent.height/2], size=[1.5*self.parent.height,1.5*self.parent.height])
+            # # #self.parent.canvas.add(green)
             super(AudioButton, self).on_touch_down(touch)
             # print self.text  # references the level,
             # print self.parent.parent.frequencyLabel  #
         if self.collide_point(*touch.pos) and touch.is_double_tap == True:
-            self.airconduction.source = 'EMPTY.png'
+            self.airconduction.source = 'Icons\EMPTY.png'
             print "popped"  # will need to implement a time delay
         return
 
