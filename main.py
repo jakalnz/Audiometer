@@ -50,6 +50,70 @@ def makeTexture(path1, path2):
     return tex
 
 
+def reCodeStringToButton(currentSymbol):
+    index = 'RAC'
+    value = [0, 0]
+
+    if currentSymbol[0] == 'ra':
+        index = 'RAC'
+    elif currentSymbol[0] == 'rb':
+        index = 'RBC'
+    elif currentSymbol[4] == 'la':
+        index = 'LAC'
+    elif currentSymbol[4] == 'lb':
+        index = 'LBC'
+
+    if currentSymbol[0][0] == 'r':
+        if currentSymbol[1] == '-' and currentSymbol[2] == '--':  # threshold
+            value = [1, currentSymbol[3]]
+        elif currentSymbol[1] == 'm' and currentSymbol[2] == '--':  # maskedthreshold
+            value = [2, currentSymbol[3]]
+        elif currentSymbol[1] == '-' and currentSymbol[2] == 'nr':  # nrthreshold
+            value = [3, currentSymbol[3]]
+        elif currentSymbol[1] == 'm' and currentSymbol[2] == 'nr':  # nrmaskedthreshold
+            value = [4, currentSymbol[3]]
+
+    else:
+        if currentSymbol[5] == '-' and currentSymbol[6] == '--':  # threshold
+            value = [1, currentSymbol[7]]
+        elif currentSymbol[5] == 'm' and currentSymbol[6] == '--':  # maskedthreshold
+            value = [2, currentSymbol[7]]
+        elif currentSymbol[5] == '-' and currentSymbol[6] == 'nr':  # nrthreshold
+            value = [3, currentSymbol[7]]
+        elif currentSymbol[5] == 'm' and currentSymbol[6] == 'nr':  # nrmaskedthreshold
+            value = [4, currentSymbol[7]]
+
+    output = [index, value]
+
+    return output
+
+
+def ButtonDictToString(value):
+    '''reads input (ButtonDict) and returns a list of strings in the format:
+     [[rightBCcode], [centreACcode], [leftBCcode]]
+    '''
+
+    # output base
+
+    string_dict = {}
+
+    start_key = {'RAC': 'ra', 'LAC': 'la', 'RBC': 'rb', 'LBC': 'lb'}
+    symbol_key = {0: '---', 1: '---', 2: 'm--', 3: '-nr', 4: 'mnr'}
+
+    for key in value:
+        # determine if value is 0 and then put '--' in string
+        if value[key][0] == 0:
+            string_dict[key] = '--' + symbol_key[value[key][0]]
+        else:
+            string_dict[key] = start_key[key] + symbol_key[value[key][0]]
+
+    RBCcode = string_dict['RBC'] + str(value['RBC'][1]) + '-----0'
+    LBCcode = '-----0' + string_dict['LBC'] + str(value['LBC'][1])
+    ACcode = string_dict['RAC'] + str(value['RAC'][1]) + string_dict['LAC'] + str(value['LAC'][1])
+
+    return [RBCcode, ACcode, LBCcode]
+
+
 # buttons create
 class AudioButton(Button):
     level = NumericProperty(0)
@@ -62,36 +126,47 @@ class AudioButton(Button):
     # ltex = ObjectProperty(None)
     # rtex = ObjectProperty(None)
 
-    # dictionary that stores contents, numeric values = 0-empty, 1-threshold, 2-maskedthreshold 2-noresp, 3-absent, 4-note1, 5-note2, 6-note3
-    contents = DictProperty(
-        {'LAC': 0, 'RAC': 0, 'MLAC': 0, 'MRAC': 0, 'LBC': 0, 'RBC': 0, 'MLBC': 0, 'MRBC': 0, 'SF': 0, 'AID': 0,
-         'CI': 0})
+    # dictionary that stores contents, numeric values = [0-empty, 1-threshold, 2-maskedthreshold 3-threshnoresp, 4maskenoresp],[ 0-no note,1-note1, 2-note2, 3-note3]]
+    contents = DictProperty({'LAC': [0, 0], 'RAC': [0, 0], 'LBC': [0, 0], 'RBC': [0, 0]})
 
     # create a method that on click reports position of button, gives level, gets frequencycolumn label
     def changeImage(self):
         currentSymbol = App.get_running_app().controllerOutput
+        print currentSymbol
 
-        # if
-        self.airconduction.source = 'Images/' + ''.join(App.get_running_app().controllerOutput) + '.png'
+        # adds the symbol to the Button dictProperty "contents"
+        # print reCodeStringToButton(currentSymbol)
+        new_content_list = reCodeStringToButton(currentSymbol)
+        print 'this is the content list: '
+        print new_content_list
+        self.contents[new_content_list[0]] = new_content_list[1]
 
-        #
-        #
-        #
-        # self.airconduction.source = overlayImage(Image.open('RAC.png'), Image.open('LAC.png'))
+        # decode contents
+        symbolList = ButtonDictToString(self.contents)
+        print 'this is the symbolList: '
+        print symbolList
+
+        self.airconduction.source = 'Images/' + symbolList[1] + '.png'
+
+        # only do BC for BC frequencies alternatively could have a second method for intermediate freq
+        if self.parent.parent.frequencyLabel in ['125', '250', '500', '1000', '2000', '4000']:
+            self.rightboneconduction.source = 'Images/' + symbolList[0] + '.png'
+            self.leftboneconduction.source = 'Images/' + symbolList[2] + '.png'
+
+
         print self.text  # references the level,
         print self.parent.parent.frequencyLabel  # references the frequency
 
-        # if touch.is_double_tap:
-        # self.airconduction.source = 'BLANK.png'
-        return
-
-    def changeImage2(self):
-        self.parent.ctex = makeTexture('LAC.png', 'RBC.png')
-        print self.text  # references the level,
-        print self.parent.parent.frequencyLabel  # references the frequency
-        print self.parent.ctex
 
         return
+
+    # def changeImage2(self):
+    #     self.parent.ctex = makeTexture('LAC.png', 'RBC.png')
+    #     print self.text  # references the level,
+    #     print self.parent.parent.frequencyLabel  # references the frequency
+    #     print self.parent.ctex
+    #
+    #     return
 
     #    def changeImage(self, instance, value):
     #     def doubleTap(self,touch):
@@ -114,23 +189,25 @@ class AudioButton(Button):
 
     def on_touch_down(self, touch):
         if self.collide_point(*touch.pos) and touch.is_double_tap == False:
-            # self.airconduction.source = 'RED.png'
-            # blue = InstructionGroup()
-            # blue.add(Color(0, 0, 1, 0.2))
-            # blue.add(Rectangle(pos=self.pos, size=(100, 100)))
-            #
-            # green = InstructionGroup()
-            # green.add(Color(0, 1, 0, 0.4))
-            # green.add(Rectangle(pos=(100, 100), size=(100, 100)))
-
-            # with self.parent.canvas:
-            #      add.Rectangle(source = 'Images/' + ''.join(App.get_running_app().controllerOutput) + '.png', pos=[self.parent.center_x-1.5*self.parent.height/2, self.parent.center_y-1.5*self.parent.height/2], size=[1.5*self.parent.height,1.5*self.parent.height])
-            # # #self.parent.canvas.add(green)
             super(AudioButton, self).on_touch_down(touch)
             # print self.text  # references the level,
             # print self.parent.parent.frequencyLabel  #
-        if self.collide_point(*touch.pos) and touch.is_double_tap == True:
-            self.airconduction.source = 'Icons\EMPTY.png'
+
+        #     double tap
+        if self.collide_point(*touch.pos) and touch.is_double_tap:
+            currentSymbol = App.get_running_app().controllerOutput
+            print currentSymbol
+            new_content_list = reCodeStringToButton(currentSymbol)
+            self.contents[new_content_list[0]] = [0, 0]  # removes item from list
+            symbolList = ButtonDictToString(self.contents)  # this is the
+
+            self.airconduction.source = 'Images/' + symbolList[1] + '.png'
+
+            # only do BC for BC frequencies alternatively could have a second method for intermediate freq
+            if self.parent.parent.frequencyLabel in ['125', '250', '500', '1000', '2000', '4000']:
+                self.rightboneconduction.source = 'Images/' + symbolList[0] + '.png'
+                self.leftboneconduction.source = 'Images/' + symbolList[2] + '.png'
+            #self.airconduction.source = 'Icons\EMPTY.png'
             print "popped"  # will need to implement a time delay
         return
 
