@@ -1,3 +1,7 @@
+# consider using an accordian for the line and controller setup, also allows other draw options
+#  in limited space
+
+
 # create a grid of buttons which if pressed will inform the paint class where to paint the symbol on the canvas
 # but the symbol type (AC masked/unmasked) will be based on input from other buttons
 # ill need 250,500,750,1000,2000,3000,4000,6000,8000 (9 buttons) by
@@ -10,10 +14,7 @@ from itertools import izip as zip
 # create an audiogram widget with 9 frequency children [propery] each frequency child to have 25 buttons [property]
 # from PIL import Image
 from kivy.app import App
-from kivy.core.image import Image
-# from kivy.graphics.instructions import InstructionGroup
 from kivy.core.window import Window
-from kivy.graphics.texture import Texture
 from kivy.properties import ObjectProperty, DictProperty, NumericProperty, StringProperty, ListProperty
 from kivy.uix.button import Button
 from kivy.uix.tabbedpanel import TabbedPanel
@@ -21,33 +22,9 @@ from kivy.uix.widget import Widget
 
 get_indexes = lambda x, xs: [i for (y, i) in zip(xs, range(len(xs))) if x == y]
 
-# from kivy.input import MotionEvent
+
 Window.clearcolor = (1, 1, 1, 1)
 
-
-# Method that takes list input from button and outputs a texture that applies to the image button
-
-# Method for overlayingImages not usefult in this context
-# def overlayImage(layer1,layer2):
-#
-#     out_image = Image.new("RGBA", layer1.size)
-#     out_image = Image.alpha_composite(out_image, layer1)
-#     out_image = Image.alpha_composite(out_image, layer2)
-#
-#     return out_image
-
-# method to merge textures takes path input
-def makeTexture(path1, path2):
-    bkimg = Image(path1)
-    frimg = Image(path2)
-    #
-    tex = Texture.create(size=bkimg.size, colorfmt='rgba')
-    tex.blit_buffer(pbuffer=bkimg.texture.pixels, colorfmt='rgba')
-    # tex.blit_buffer(pbuffer=frimg.texture.pixels)
-    tex.blit_buffer(pbuffer=frimg.texture.pixels, colorfmt='rgba')
-    tex.save("test.png")
-
-    return tex
 
 
 def reCodeStringToButton(currentSymbol):
@@ -160,38 +137,22 @@ class AudioButton(Button):
 
         return
 
-    # def changeImage2(self):
-    #     self.parent.ctex = makeTexture('LAC.png', 'RBC.png')
-    #     print self.text  # references the level,
-    #     print self.parent.parent.frequencyLabel  # references the frequency
-    #     print self.parent.ctex
-    #
-    #     return
 
-    #    def changeImage(self, instance, value):
-    #     def doubleTap(self,touch):
-    #         print('test')
-    #         print('Touch:', touch)
-    #         if touch.is_double_tap == True:
-    #             self.airconduction.source = 'BLUE.png'
-
-
-
-
-    # def on_double_tap(self,touch): #works but does everything
-    #     print('test')
-    #     print('Touch:', touch)
-    #     if touch.is_double_tap == True:
-    #         self.airconduction.source = 'BLUE.png'
-    #
-    #     #print('Button:', touch.button)
-    #     super(AudioButton, self).on_touch_down(touch)
 
     def on_touch_down(self, touch):
-        if self.collide_point(*touch.pos) and touch.is_double_tap == False:
+        if (self.collide_point(*touch.pos) and touch.is_double_tap == False
+            and self.parent.parent.parent.parent.parent.parent.parent.parent.ids.drawlineDrawer.collapse == False):
+            print('my precious you found the parent')
+            # so now I want to reference a draw method in the audiogramW canvas I think?
+            # I want it to take thes touck inputs and then take the next collide on drag for a button containing either
+            # a r or l AC symbol, and draw a line between them
+
+        elif self.collide_point(*touch.pos) and touch.is_double_tap == False:
             super(AudioButton, self).on_touch_down(touch)
             # print self.text  # references the level,
             # print self.parent.parent.frequencyLabel  #
+            print self.parent.parent.parent.parent.ids
+            print self.parent.parent.parent.parent.parent.parent.parent.parent.ids  # this is it
 
         #     double tap
         if self.collide_point(*touch.pos) and touch.is_double_tap:
@@ -334,12 +295,14 @@ class Controller(Widget):
 
 
 class MainScreen(TabbedPanel):
+    drawlineDrawer = ObjectProperty()
     pass
 
 
 class DrawAudioApp(App):
     symbolType = StringProperty
     controllerOutput = ListProperty(['--', '-', '--', '0', '--', '-', '--', '0'])
+
 
     def build(self):
         return MainScreen()

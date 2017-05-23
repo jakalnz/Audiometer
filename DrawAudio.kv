@@ -471,7 +471,7 @@
         Label:
             halign:"left"
             text:"-10"
-            #color:0,0,0,1
+            color:0,0,0,1
 
         Label:
             text:"-5"
@@ -548,6 +548,12 @@
 
 #Puts all the columns together and make an audiogram widget
 <AudiogramW>:
+    canvas.before:
+        Color:
+            rgb: 1,1,1
+        Rectangle
+            pos:self.pos[0],self.pos[1]
+            size:self.size
     GridLayout:
         size: root.size
         pos:root.pos
@@ -709,6 +715,7 @@
                         pos:self.pos
                         source:'Icons/M-LBC.png'
 
+
         Label:
             text:"Modifiers"
             size_hint_y:.1
@@ -745,6 +752,7 @@
             values:['Good','Fair', 'Poor']
 
 <MainScreen>:
+    drawlineDrawer:drawlineDrawer
     size:root.size
     do_default_tab: False
     tab_width: self.size[0]/len(self.tab_list)
@@ -768,8 +776,46 @@
 
                 AudiogramW:
 
-                Controller:
+#                Controller:
+#                    size_hint_x:.2
+                Accordion:
                     size_hint_x:.2
+                    orientation:'vertical'
+
+
+                    AccordionItem:
+                        id:drawlineDrawer
+                        title:'Mark Lines'
+
+                        BoxLayout:
+                            orientation:'vertical'
+                            ToggleButton
+                                id:redline
+                                group:'draw'
+                                on_press:root.getControllerInput('redline')
+                                text:'red line'
+
+                            ToggleButton
+                                id:blueline
+                                group:'draw'
+                                on_press:root.getControllerInput('blueline')
+                                text:'blue line'
+
+                            Button
+                                id:clearred
+                                text: 'Clear Red Line'
+                                #on_press:method that clears the lines drawn
+
+                            Button
+                                id:clearblue
+                                text: 'Clear Blue Line'
+                                #on_press: method that clears the blue lines
+                    AccordionItem:
+                        title:'Draw Symbols'
+                        Controller
+
+
+
             GridLayout:
                 size_hint_y:.1
                 pos:root.pos
