@@ -1,6 +1,5 @@
-# consider using an accordian for the line and controller setup, also allows other draw options
-#  in limited space
-
+# add an auto line method
+# also a method that accesses lines
 
 # create a grid of buttons which if pressed will inform the paint class where to paint the symbol on the canvas
 # but the symbol type (AC masked/unmasked) will be based on input from other buttons
@@ -15,6 +14,8 @@ from itertools import izip as zip
 # from PIL import Image
 from kivy.app import App
 from kivy.core.window import Window
+from kivy.graphics import Color, Line
+from kivy.input.shape import ShapeRect
 from kivy.properties import ObjectProperty, DictProperty, NumericProperty, StringProperty, ListProperty
 from kivy.uix.button import Button
 from kivy.uix.tabbedpanel import TabbedPanel
@@ -143,16 +144,37 @@ class AudioButton(Button):
         if (self.collide_point(*touch.pos) and touch.is_double_tap == False
             and self.parent.parent.parent.parent.parent.parent.parent.parent.ids.drawlineDrawer.collapse == False):
             print('my precious you found the parent')
+
+            # with self.parent.parent.parent.parent.parent.parent.parent.parent.canvas:
+            with self.parent.parent.parent.canvas:
+                # logic to change initial colour and line
+                if App.get_running_app().lineType == 'right':
+                    Color(1, 0, 0, 1)
+                    touch.ud['redline'] = Line(points=(self.center_x, self.center_y))
+                elif App.get_running_app().lineType == 'left':
+                    Color(0, 0, 1, 1)
+                    touch.ud['blueline'] = Line(points=(self.center_x, self.center_y), dash_offset=5)
             # so now I want to reference a draw method in the audiogramW canvas I think?
             # I want it to take thes touck inputs and then take the next collide on drag for a button containing either
             # a r or l AC symbol, and draw a line between them
 
-        elif self.collide_point(*touch.pos) and touch.is_double_tap == False:
+        elif self.collide_point(*touch.pos) and not touch.is_double_tap:
             super(AudioButton, self).on_touch_down(touch)
             # print self.text  # references the level,
             # print self.parent.parent.frequencyLabel  #
+
+            # print self.parent.parent.parent.parent.parent.parent.parent.parent.ids  # this is it
+
+            if isinstance(touch.shape, ShapeRect):
+                print('My touch have a rectangle shape of size',
+                      (touch.shape.width, touch.shape.height))
+            else:
+                print 'nah bro'
+
             print self.parent.parent.parent.parent.ids
-            print self.parent.parent.parent.parent.parent.parent.parent.parent.ids  # this is it
+
+            print '-' * 10
+            print self.parent.parent.parent.parent.ids['audiogramW'].ids
 
         #     double tap
         if self.collide_point(*touch.pos) and touch.is_double_tap:
@@ -172,6 +194,33 @@ class AudioButton(Button):
             print "popped"  # will need to implement a time delay
         return
 
+    def on_touch_move(self, touch):
+        if (self.parent.parent.parent.parent.parent.parent.parent.parent.ids.drawlineDrawer.collapse == False
+            and self.collide_point(*touch.pos)):
+
+            # add logic to change line colour if NR to clear
+            if App.get_running_app().lineType == 'right':
+                if self.contents['RAC'][0] != 0:
+                    touch.ud['redline'].points += [self.airconduction.center_x, self.center_y]
+                    # add logic to change the colour in here
+
+            if App.get_running_app().lineType == 'left':
+                if self.contents['LAC'][0] != 0:
+                    # if self.contents['LAC'][0] == 3 or 4: # if values have NR then make pen clear
+                    #     touch.ud['blueline'].width = 0.0
+                    touch.ud['blueline'].points += [self.airconduction.center_x, self.center_y]
+                    # add logic to change the colour in here
+
+                    # print self.ids
+
+                    # touch.ud['line'].points += [touch.x, touch.y]
+
+                    # def on_touch_up(self, touch):
+                    #     if (self.parent.parent.parent.parent.parent.parent.parent.parent.ids.drawlineDrawer.collapse == False
+                    #         and self.collide_point(*touch.pos)):
+                    #         print str(self.text) + ' * ' + str(self.parent.parent.frequencyLabel) + ' was lifted'
+                    #         touch.ud['line'].points += [self.airconduction.center_x, self.center_y]
+
 
 class FrequencyColumn(Widget):
     frequencyLabel = StringProperty("")
@@ -182,6 +231,7 @@ class HalfFrequencyColumn(Widget):
 
 
 class AudiogramW(Widget):
+    audiogramw = ObjectProperty()
     soll = NumericProperty(0)
     # def on_touch_up(self, touch):
 
@@ -296,12 +346,18 @@ class Controller(Widget):
 
 class MainScreen(TabbedPanel):
     drawlineDrawer = ObjectProperty()
+
+    def getLineType(self, input):
+        App.get_running_app().lineType = input
+
+
     pass
 
 
 class DrawAudioApp(App):
-    symbolType = StringProperty
+    symbolType = StringProperty()
     controllerOutput = ListProperty(['--', '-', '--', '0', '--', '-', '--', '0'])
+    lineType = StringProperty()
 
 
     def build(self):

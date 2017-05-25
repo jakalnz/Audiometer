@@ -85,7 +85,7 @@ for pos in range(len(o_both)):
         # add NR symbol
         if o_both[pos][1] == '-':
             newImage = overlayImage(newImage, Image.open('R-longNR.png'))
-        if o_both[pos][1] == 'nr':
+        if o_both[pos][1] == 'm':
             newImage = overlayImage(newImage, Image.open('R-NR.png'))
 
     if o_both[pos][3] == '1':
@@ -105,7 +105,7 @@ for pos in range(len(o_both)):
         # add NR symbol
         if o_both[pos][5] == '-':
             newImage = overlayImage(newImage, Image.open('L-longNR.png'))
-        if o_both[pos][5] == 'nr':
+        if o_both[pos][5] == 'm':
             newImage = overlayImage(newImage, Image.open('L-NR.png'))
 
     if o_both[pos][7] == '1':

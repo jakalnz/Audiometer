@@ -19,6 +19,7 @@
 
     size_hint:(1,1)
     on_press: self.changeImage() #WORKS!
+    #on_touch_up: print str(self.text) +' * '+ str(self.parent.parent.frequencyLabel) + ' was lifted'
 
 #    canvas:
 ##
@@ -548,6 +549,8 @@
 
 #Puts all the columns together and make an audiogram widget
 <AudiogramW>:
+    audiogramW:audiogramW
+
     canvas.before:
         Color:
             rgb: 1,1,1
@@ -555,6 +558,8 @@
             pos:self.pos[0],self.pos[1]
             size:self.size
     GridLayout:
+        padding:0,10,0,10
+        id:audiogramW
         size: root.size
         pos:root.pos
 	    rows: 1
@@ -792,13 +797,13 @@
                             ToggleButton
                                 id:redline
                                 group:'draw'
-                                on_press:root.getControllerInput('redline')
+                                on_press:root.getLineType('right')
                                 text:'red line'
 
                             ToggleButton
                                 id:blueline
                                 group:'draw'
-                                on_press:root.getControllerInput('blueline')
+                                on_press:root.getLineType('left')
                                 text:'blue line'
 
                             Button
