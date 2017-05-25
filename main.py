@@ -15,7 +15,6 @@ from itertools import izip as zip
 from kivy.app import App
 from kivy.core.window import Window
 from kivy.graphics import Color, Line
-from kivy.input.shape import ShapeRect
 from kivy.properties import ObjectProperty, DictProperty, NumericProperty, StringProperty, ListProperty
 from kivy.uix.button import Button
 from kivy.uix.tabbedpanel import TabbedPanel
@@ -154,6 +153,10 @@ class AudioButton(Button):
                 elif App.get_running_app().lineType == 'left':
                     Color(0, 0, 1, 1)
                     touch.ud['blueline'] = Line(points=(self.center_x, self.center_y), dash_offset=5)
+
+                App.get_running_app().linesDictList.append(touch.ud)
+                print 'touch.ud'
+                print touch.ud
             # so now I want to reference a draw method in the audiogramW canvas I think?
             # I want it to take thes touck inputs and then take the next collide on drag for a button containing either
             # a r or l AC symbol, and draw a line between them
@@ -165,11 +168,7 @@ class AudioButton(Button):
 
             # print self.parent.parent.parent.parent.parent.parent.parent.parent.ids  # this is it
 
-            if isinstance(touch.shape, ShapeRect):
-                print('My touch have a rectangle shape of size',
-                      (touch.shape.width, touch.shape.height))
-            else:
-                print 'nah bro'
+
 
             print self.parent.parent.parent.parent.ids
 
@@ -207,7 +206,8 @@ class AudioButton(Button):
             if App.get_running_app().lineType == 'left':
                 if self.contents['LAC'][0] != 0:
                     # if self.contents['LAC'][0] == 3 or 4: # if values have NR then make pen clear
-                    #     touch.ud['blueline'].width = 0.0
+
+                    # touch.ud['blueline'].width = 0.0
                     touch.ud['blueline'].points += [self.airconduction.center_x, self.center_y]
                     # add logic to change the colour in here
 
@@ -347,10 +347,27 @@ class Controller(Widget):
 class MainScreen(TabbedPanel):
     drawlineDrawer = ObjectProperty()
 
+    def searchAndDestroy(self, akey, alist):
+
+        for dict_element in alist:
+            if akey in dict_element:
+                dict_element[akey].points = []
+
+        return alist
+
+
     def getLineType(self, input):
         App.get_running_app().lineType = input
 
+    def clearRedLine(
+            self):  # not working as this clears each time maybe introduce a couple of canvases for the lines that can just be cleared
+        # or update the dict rather than overight it each time the method is called maybe it needs to be a list of dicts
 
+        # print App.get_running_app().linesDict
+        App.get_running_app().linesDictList = self.searchAndDestroy('redline', App.get_running_app().linesDictList)
+
+    def clearBlueLine(self):
+        App.get_running_app().linesDictList = self.searchAndDestroy('blueline', App.get_running_app().linesDictList)
     pass
 
 
@@ -358,6 +375,9 @@ class DrawAudioApp(App):
     symbolType = StringProperty()
     controllerOutput = ListProperty(['--', '-', '--', '0', '--', '-', '--', '0'])
     lineType = StringProperty()
+    clearRed = ObjectProperty()
+    clearBlue = ObjectProperty()
+    linesDictList = ListProperty()
 
 
     def build(self):

@@ -809,12 +809,12 @@
                             Button
                                 id:clearred
                                 text: 'Clear Red Line'
-                                #on_press:method that clears the lines drawn
+                                on_press: root.clearRedLine()
 
                             Button
                                 id:clearblue
                                 text: 'Clear Blue Line'
-                                #on_press: method that clears the blue lines
+                                on_press: root.clearBlueLine() # method that clears the blue lines
                     AccordionItem:
                         title:'Draw Symbols'
                         Controller
