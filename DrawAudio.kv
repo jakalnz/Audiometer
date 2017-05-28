@@ -15,8 +15,11 @@
     #background_color: (1, 1, 1, 1) #a nice white background that hides my image
     background_color: (0, 0, 0, 0) #a nice white background that hides my image
     text:"one"
+    color:0,0,0,0 #made opacity 0 so cant interfere with grid lines may look to doing button behaviour
+
     size_hint:(1,1)
     on_press: self.changeImage() #WORKS!
+    #on_touch_up: print str(self.text) +' * '+ str(self.parent.parent.frequencyLabel) + ' was lifted'
 
 #    canvas:
 ##
@@ -45,18 +48,18 @@
     Image:
         id:rightboneconduction
         source:'Icons/EMPTY.png'
-        x:self.parent.center_x-3*self.parent.height/2
-        y:self.parent.center_y-self.parent.height/2
-        size:self.parent.height,self.parent.height
-
+        x:self.parent.center_x-1.5*3*self.parent.height/2
+        y:self.parent.center_y-1.5*self.parent.height/2
+        size:1.5*self.parent.height,1.5*self.parent.height
+        mipmap: root.mipmap
 
     Image:
         id:leftboneconduction
         source:'Icons/EMPTY.png'
-        x:self.parent.center_x+self.parent.height/2
-        y:self.parent.center_y-self.parent.height/2
-        size:self.parent.height,self.parent.height
-
+        x:self.parent.center_x+1.5*self.parent.height/2
+        y:self.parent.center_y-1.5*self.parent.height/2
+        size:1.5*self.parent.height,1.5*self.parent.height
+        mipmap: root.mipmap
 
 
 
@@ -71,7 +74,7 @@
             pos:self.pos[0],self.pos[1]
             size:self.width,self.height-self.height/26
 
-    canvas.after:
+    canvas:
 
         Color:
             rgb: 0, 0, 0
@@ -243,7 +246,7 @@
             pos:self.pos[0],self.pos[1]
             size:self.width,self.height-self.height/26
 
-    canvas.after:
+    canvas:
         Color:
             rgb: 0, 0, 0
         Rectangle:
@@ -469,7 +472,7 @@
         Label:
             halign:"left"
             text:"-10"
-            #color:0,0,0,1
+            color:0,0,0,1
 
         Label:
             text:"-5"
@@ -546,7 +549,17 @@
 
 #Puts all the columns together and make an audiogram widget
 <AudiogramW>:
+    audiogramW:audiogramW
+
+    canvas.before:
+        Color:
+            rgb: 1,1,1
+        Rectangle
+            pos:self.pos[0],self.pos[1]
+            size:self.size
     GridLayout:
+        padding:0,10,0,10
+        id:audiogramW
         size: root.size
         pos:root.pos
 	    rows: 1
@@ -595,25 +608,141 @@
 
 <PatientDetails>:
     BoxLayout:
+        id:details
         size:root.size
         pos:root.pos
         orientation:'vertical'
 
+        GridLayout:
+            id: demographics
+            cols:4
+            Label:
+                size_hint_y:0.2
+                size_hint_x:0.3
+            Label:
+                size_hint_y:0.2
+                text:'First'
+            Label:
+                size_hint_y:0.2
+                text:'Surname'
 
-        Label:
-            text:'Patient Name:'
-        TextInput:
-        TextInput:
+            Label:
+                size_hint_x:0.3
+                size_hint_y:0.2
+            Label:
+                text:'Name'
+                size_hint_x:0.3
 
-        Label:
-            text:'D.O.B.:'
-        TextInput
-        TextInput
-        TextInput
+            TextInput:
+                id:first_name
+                write_tab: False
+                multiline: False
+            TextInput:
+                id:surname
+                write_tab: False
+                multiline: False
+            Label:
+                size_hint_x:0.3
+            # DOB  LABEL
+            Label:
+                size_hint_x:0.3
+                size_hint_y:0.2
+            BoxLayout:
+                size_hint_y:0.2
+                Label:
+                    text:'Day'
+                    size_hint_x:0.2
+                Label:
+                    text:'Month'
+                    size_hint_x:0.2
+                Label:
+                    text:'Year'
+                    size_hint_x:0.6
+            #GENDER LABEL
+            BoxLayout:
+                size_hint_y:0.2
+                Label:
+                Label:
+                    text:'Male'
+                    #size_hint_x:0.2
+                Label:
+                    text:'Female'
+                    #size_hint_x:0.2
+                Label:
 
-        Spinner:
-            text: "M/F"
-            values: ["Male", "Female"]
+            Label:
+                size_hint_x:0.3
+                size_hint_y:0.2
+            # DOB INPUT
+            Label:
+                text:'D.O.B.:'
+                size_hint_x:0.3
+            BoxLayout:
+                size_hint_y:0.2
+                TextInput:
+                    id:dob_day
+                    size_hint_x:0.2
+                    write_tab: False
+                    multiline: False
+
+                TextInput:
+                    id:dob_month
+                    size_hint_x:0.2
+                    write_tab: False
+                    multiline: False
+                TextInput:
+                    id:dob_year
+                    size_hint_x:0.6
+                    write_tab: False
+                    multiline: False
+
+            #GENDER INPUT
+            BoxLayout:
+                size_hint_y:0.2
+                Label:
+                    text:'Gender:'
+
+                CheckBox:
+                    id:chk_male
+                    group:'gender'
+                    #size_hint_x:0.2
+                CheckBox:
+                    id:chk_female
+                    group:'gender'
+                    #size_hint_x:0.2
+                Label:
+                    #size_hint_x:0.3
+            Label:
+                size_hint_x:0.3
+
+
+
+
+
+        GridLayout:
+            cols:3
+            size_hint_y:0.9
+
+            Label:
+                size_hint_x:0.144
+                text:'File#:'
+            TextInput:
+                id: file_number
+                write_tab: False
+                multiline: False
+            Label:
+                size_hint_x:0.12
+            Label:
+                size_hint_x:0.144
+                text:'Email'
+            TextInput:
+                id:email
+                write_tab: False
+                multiline: False
+            Label:
+                size_hint_x:0.12
+
+
 
 
 <Controller>:
@@ -707,6 +836,7 @@
                         pos:self.pos
                         source:'Icons/M-LBC.png'
 
+
         Label:
             text:"Modifiers"
             size_hint_y:.1
@@ -743,6 +873,8 @@
             values:['Good','Fair', 'Poor']
 
 <MainScreen>:
+    current_audiogram:current_audiogram
+    drawlineDrawer:drawlineDrawer
     size:root.size
     do_default_tab: False
     tab_width: self.size[0]/len(self.tab_list)
@@ -753,11 +885,15 @@
     TabbedPanelItem:
         text:'Audiogram'
         BoxLayout:
+            id:current_audiogram
             size:root.size
             orientation:'vertical'
             Label:
                 size_hint_y:.1
-                text:"Patient:"
+                valign: 'middle'
+                halign:'left'
+                text_size: self.size
+                text:" Patient:"
 
             GridLayout:
                 size:root.size
@@ -766,8 +902,46 @@
 
                 AudiogramW:
 
-                Controller:
+#                Controller:
+#                    size_hint_x:.2
+                Accordion:
                     size_hint_x:.2
+                    orientation:'vertical'
+
+
+                    AccordionItem:
+                        id:drawlineDrawer
+                        title:'Mark Lines'
+
+                        BoxLayout:
+                            orientation:'vertical'
+                            ToggleButton
+                                id:redline
+                                group:'draw'
+                                on_press:root.getLineType('right')
+                                text:'red line'
+
+                            ToggleButton
+                                id:blueline
+                                group:'draw'
+                                on_press:root.getLineType('left')
+                                text:'blue line'
+
+                            Button
+                                id:clearred
+                                text: 'Clear Red Line'
+                                on_press: root.clearRedLine()
+
+                            Button
+                                id:clearblue
+                                text: 'Clear Blue Line'
+                                on_press: root.clearBlueLine() # method that clears the blue lines
+                    AccordionItem:
+                        title:'Draw Symbols'
+                        Controller
+
+
+
             GridLayout:
                 size_hint_y:.1
                 pos:root.pos
@@ -783,3 +957,9 @@
         text:'Immittance'
     TabbedPanelItem:
         text:'Report'
+        BoxLayout:
+            id:ReportMaker
+            Button:
+                id:print_audiogram_btn
+                text:'Save Audiogram as PNG'
+                on_press:root.save_audiogram()
