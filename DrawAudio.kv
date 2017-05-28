@@ -608,25 +608,141 @@
 
 <PatientDetails>:
     BoxLayout:
+        id:details
         size:root.size
         pos:root.pos
         orientation:'vertical'
 
+        GridLayout:
+            id: demographics
+            cols:4
+            Label:
+                size_hint_y:0.2
+                size_hint_x:0.3
+            Label:
+                size_hint_y:0.2
+                text:'First'
+            Label:
+                size_hint_y:0.2
+                text:'Surname'
 
-        Label:
-            text:'Patient Name:'
-        TextInput:
-        TextInput:
+            Label:
+                size_hint_x:0.3
+                size_hint_y:0.2
+            Label:
+                text:'Name'
+                size_hint_x:0.3
 
-        Label:
-            text:'D.O.B.:'
-        TextInput
-        TextInput
-        TextInput
+            TextInput:
+                id:first_name
+                write_tab: False
+                multiline: False
+            TextInput:
+                id:surname
+                write_tab: False
+                multiline: False
+            Label:
+                size_hint_x:0.3
+            # DOB  LABEL
+            Label:
+                size_hint_x:0.3
+                size_hint_y:0.2
+            BoxLayout:
+                size_hint_y:0.2
+                Label:
+                    text:'Day'
+                    size_hint_x:0.2
+                Label:
+                    text:'Month'
+                    size_hint_x:0.2
+                Label:
+                    text:'Year'
+                    size_hint_x:0.6
+            #GENDER LABEL
+            BoxLayout:
+                size_hint_y:0.2
+                Label:
+                Label:
+                    text:'Male'
+                    #size_hint_x:0.2
+                Label:
+                    text:'Female'
+                    #size_hint_x:0.2
+                Label:
 
-        Spinner:
-            text: "M/F"
-            values: ["Male", "Female"]
+            Label:
+                size_hint_x:0.3
+                size_hint_y:0.2
+            # DOB INPUT
+            Label:
+                text:'D.O.B.:'
+                size_hint_x:0.3
+            BoxLayout:
+                size_hint_y:0.2
+                TextInput:
+                    id:dob_day
+                    size_hint_x:0.2
+                    write_tab: False
+                    multiline: False
+
+                TextInput:
+                    id:dob_month
+                    size_hint_x:0.2
+                    write_tab: False
+                    multiline: False
+                TextInput:
+                    id:dob_year
+                    size_hint_x:0.6
+                    write_tab: False
+                    multiline: False
+
+            #GENDER INPUT
+            BoxLayout:
+                size_hint_y:0.2
+                Label:
+                    text:'Gender:'
+
+                CheckBox:
+                    id:chk_male
+                    group:'gender'
+                    #size_hint_x:0.2
+                CheckBox:
+                    id:chk_female
+                    group:'gender'
+                    #size_hint_x:0.2
+                Label:
+                    #size_hint_x:0.3
+            Label:
+                size_hint_x:0.3
+
+
+
+
+
+        GridLayout:
+            cols:3
+            size_hint_y:0.9
+
+            Label:
+                size_hint_x:0.144
+                text:'File#:'
+            TextInput:
+                id: file_number
+                write_tab: False
+                multiline: False
+            Label:
+                size_hint_x:0.12
+            Label:
+                size_hint_x:0.144
+                text:'Email'
+            TextInput:
+                id:email
+                write_tab: False
+                multiline: False
+            Label:
+                size_hint_x:0.12
+
+
 
 
 <Controller>:
@@ -757,6 +873,7 @@
             values:['Good','Fair', 'Poor']
 
 <MainScreen>:
+    current_audiogram:current_audiogram
     drawlineDrawer:drawlineDrawer
     size:root.size
     do_default_tab: False
@@ -768,11 +885,15 @@
     TabbedPanelItem:
         text:'Audiogram'
         BoxLayout:
+            id:current_audiogram
             size:root.size
             orientation:'vertical'
             Label:
                 size_hint_y:.1
-                text:"Patient:"
+                valign: 'middle'
+                halign:'left'
+                text_size: self.size
+                text:" Patient:"
 
             GridLayout:
                 size:root.size
@@ -836,3 +957,9 @@
         text:'Immittance'
     TabbedPanelItem:
         text:'Report'
+        BoxLayout:
+            id:ReportMaker
+            Button:
+                id:print_audiogram_btn
+                text:'Save Audiogram as PNG'
+                on_press:root.save_audiogram()

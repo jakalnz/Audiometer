@@ -14,8 +14,10 @@ from itertools import izip as zip
 # from PIL import Image
 from kivy.app import App
 from kivy.core.window import Window
+from kivy.garden.roulette import Roulette, CyclicRoulette
 from kivy.graphics import Color, Line
 from kivy.properties import ObjectProperty, DictProperty, NumericProperty, StringProperty, ListProperty
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.tabbedpanel import TabbedPanel
 from kivy.uix.widget import Widget
@@ -89,6 +91,20 @@ def ButtonDictToString(value):
     ACcode = string_dict['RAC'] + str(value['RAC'][1]) + string_dict['LAC'] + str(value['LAC'][1])
 
     return [RBCcode, ACcode, LBCcode]
+
+
+class PickDate(BoxLayout):
+    def __init__(self, **kwargs):
+        # make sure we aren't overriding any important functionality
+        super(PickDate, self).__init__(**kwargs)
+
+        # let's add a Widget to this layout
+
+        self.add_widget(CyclicRoulette(cycle=30, density=2.8, zero_indexed=False))
+        self.add_widget(CyclicRoulette(cycle=12, density=2.8, zero_indexed=False))
+        self.add_widget(Roulette(density=2.8, selected_value=1980))
+        # self.add_widget(Roulette(density=4.0, selected_value=1980))
+
 
 
 # buttons create
@@ -345,7 +361,12 @@ class Controller(Widget):
 
 
 class MainScreen(TabbedPanel):
+    current_audiogram = ObjectProperty()
     drawlineDrawer = ObjectProperty()
+    patientFirstName = StringProperty()
+    patientSecondName = StringProperty()
+    patientDOB = StringProperty()
+    patientSex = StringProperty()
 
     def searchAndDestroy(self, akey, alist):
 
@@ -355,6 +376,8 @@ class MainScreen(TabbedPanel):
 
         return alist
 
+    def save_audiogram(self):
+        self.current_audiogram.export_to_png('testpng.png')
 
     def getLineType(self, input):
         App.get_running_app().lineType = input
