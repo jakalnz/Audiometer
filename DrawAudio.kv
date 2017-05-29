@@ -637,10 +637,13 @@
                 id:first_name
                 write_tab: False
                 multiline: False
+                on_text: root.patientName[0] = self.text
             TextInput:
                 id:surname
+                height: self.minimum_height
                 write_tab: False
                 multiline: False
+                on_text: root.patientName[1] = self.text
             Label:
                 size_hint_x:0.3
             # DOB  LABEL
@@ -682,19 +685,25 @@
                 TextInput:
                     id:dob_day
                     size_hint_x:0.2
+                    input_filter:'int'
                     write_tab: False
                     multiline: False
+                    on_text: root.patientDOB[0] = self.text
 
                 TextInput:
                     id:dob_month
                     size_hint_x:0.2
+                    input_filter:'int'
                     write_tab: False
                     multiline: False
+                    on_text: root.patientDOB[1] = self.text
                 TextInput:
                     id:dob_year
+                    input_filter:'int'
                     size_hint_x:0.6
                     write_tab: False
                     multiline: False
+                    on_text: root.patientDOB[2] = self.text
 
             #GENDER INPUT
             BoxLayout:
@@ -875,6 +884,8 @@
 <MainScreen>:
     current_audiogram:current_audiogram
     drawlineDrawer:drawlineDrawer
+    patientLabel:patientLabel
+    patientInput:patientInput
     size:root.size
     do_default_tab: False
     tab_width: self.size[0]/len(self.tab_list)
@@ -882,6 +893,7 @@
         text:'Patient Information'
         BoxLayout:
             PatientDetails:
+                id:patientInput
     TabbedPanelItem:
         text:'Audiogram'
         BoxLayout:
@@ -889,12 +901,12 @@
             size:root.size
             orientation:'vertical'
             Label:
+                id:patientLabel
                 size_hint_y:.1
                 valign: 'middle'
                 halign:'left'
                 text_size: self.size
-                text:" Patient:"
-
+                text:" Patient: " + str(root.patientInput.patientName[0]) + ' ' + str(root.patientInput.patientName[1]) + '    D.O.B.: ' + str(root.patientInput.patientDOB[0]) + '/' + str(root.patientInput.patientDOB[1]) + '/' + str(root.patientInput.patientDOB[2])
             GridLayout:
                 size:root.size
                 pos:root.pos

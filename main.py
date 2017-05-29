@@ -258,10 +258,10 @@ class AudiogramW(Widget):
 
 class PatientDetails(Widget):
     # takes input for the patient database
-    nameLabel = StringProperty("")
-    surnameLabel = StringProperty("")
-    dateOfBirth = StringProperty("")
-    sexLabel = StringProperty("")
+    patientName = ListProperty(["", ""])
+    patientDOB = ListProperty(['__', '__', '____'])
+    patientSex = StringProperty()
+    patientFile = StringProperty()
 
 
 class Controller(Widget):
@@ -361,12 +361,13 @@ class Controller(Widget):
 
 
 class MainScreen(TabbedPanel):
+    patientInput = ObjectProperty()
     current_audiogram = ObjectProperty()
     drawlineDrawer = ObjectProperty()
-    patientFirstName = StringProperty()
-    patientSecondName = StringProperty()
-    patientDOB = StringProperty()
-    patientSex = StringProperty()
+    patientLabel = ObjectProperty()
+
+    #
+
 
     def searchAndDestroy(self, akey, alist):
 
@@ -375,6 +376,9 @@ class MainScreen(TabbedPanel):
                 dict_element[akey].points = []
 
         return alist
+
+    # def fillPatientDetails(self, firstname, secondname, dd, mm, yyyy, gender, filenum, email):
+    #     #
 
     def save_audiogram(self):
         self.current_audiogram.export_to_png('testpng.png')
@@ -401,6 +405,8 @@ class DrawAudioApp(App):
     clearRed = ObjectProperty()
     clearBlue = ObjectProperty()
     linesDictList = ListProperty()
+
+    # patientName = ListProperty(['', ''])
 
 
     def build(self):
