@@ -1,5 +1,11 @@
 '''Draw Audiogram App'''
-
+'''
+TO DO:
+    1. Add Technique for Audiometry - Std, CPA, VRA, 
+    2. In Speech have Material [Spondee, CVC, HINT, MLV], Score Type [SDT, SRT,PRT,WRT, MCL, UCL], ?SNR, also comments section
+    3. Add images for ART
+    4. Report
+    '''
 
 
 from itertools import izip as zip
