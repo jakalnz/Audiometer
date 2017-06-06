@@ -1,32 +1,81 @@
-# add an auto line method
-# also a method that accesses lines
+'''Draw Audiogram App'''
 
-# create a grid of buttons which if pressed will inform the paint class where to paint the symbol on the canvas
-# but the symbol type (AC masked/unmasked) will be based on input from other buttons
-# ill need 250,500,750,1000,2000,3000,4000,6000,8000 (9 buttons) by
-# (-10,-5,0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,105,110) (25 buttons)
+
 
 from itertools import izip as zip
 
-# create an audiogram widget with 9 frequency children [propery] each frequency child to have 25 buttons [property]
-# from PIL import Image
-# create an audiogram widget with 9 frequency children [propery] each frequency child to have 25 buttons [property]
-# from PIL import Image
 from kivy.app import App
-from kivy.core.window import Window
-from kivy.garden.roulette import Roulette, CyclicRoulette
+# from kivy.garden.roulette import Roulette, CyclicRoulette
 from kivy.graphics import Color, Line
 from kivy.properties import ObjectProperty, DictProperty, NumericProperty, StringProperty, ListProperty
-from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.actionbar import ActionBar
 from kivy.uix.button import Button
-from kivy.uix.tabbedpanel import TabbedPanel
+from kivy.uix.screenmanager import Screen
 from kivy.uix.widget import Widget
 
 get_indexes = lambda x, xs: [i for (y, i) in zip(xs, range(len(xs))) if x == y]
 
 
-Window.clearcolor = (1, 1, 1, 1)
 
+
+# Make a Navigation Bar
+
+
+class NavigationBar(ActionBar):
+    pass
+
+
+# Add the screens we need as subclasses
+
+
+class PatientScreen(Screen):
+    patientInput = ObjectProperty()
+
+    pass
+
+
+class AudioScreen(Screen):
+    current_audiogram = ObjectProperty()
+    drawlineDrawer = ObjectProperty()
+    patientLabel = ObjectProperty()
+
+    # patientLabel.text = App.get_running_app().patientdetails
+    # patientLabelText = StringProperty()
+
+
+
+
+    def searchAndDestroy(self, akey, alist):
+        for dict_element in alist:
+            if akey in dict_element:
+                dict_element[akey].points = []
+        return alist
+
+    def getLineType(self, input):
+        App.get_running_app().lineType = input
+
+    def clearRedLine(self):
+        App.get_running_app().linesDictList = self.searchAndDestroy('redline', App.get_running_app().linesDictList)
+
+    def clearBlueLine(self):
+        App.get_running_app().linesDictList = self.searchAndDestroy('blueline', App.get_running_app().linesDictList)
+
+    pass
+
+
+class SpeechScreen(Screen):
+    pass
+
+
+class ImmittanceScreen(Screen):
+    pass
+
+
+class ReportScreen(Screen):
+    def save_audiogram(self):
+        self.manager.get_screen('audio').current_audiogram.export_to_png('testpng.png')
+
+    pass
 
 
 def reCodeStringToButton(currentSymbol):
@@ -93,20 +142,6 @@ def ButtonDictToString(value):
     return [RBCcode, ACcode, LBCcode]
 
 
-class PickDate(BoxLayout):
-    def __init__(self, **kwargs):
-        # make sure we aren't overriding any important functionality
-        super(PickDate, self).__init__(**kwargs)
-
-        # let's add a Widget to this layout
-
-        self.add_widget(CyclicRoulette(cycle=30, density=2.8, zero_indexed=False))
-        self.add_widget(CyclicRoulette(cycle=12, density=2.8, zero_indexed=False))
-        self.add_widget(Roulette(density=2.8, selected_value=1980))
-        # self.add_widget(Roulette(density=4.0, selected_value=1980))
-
-
-
 # buttons create
 class AudioButton(Button):
     level = NumericProperty(0)
@@ -115,9 +150,6 @@ class AudioButton(Button):
     rightboneconduction = ObjectProperty(None)
     leftboneconduction = ObjectProperty(None)
     mipmap = True
-    # ctex = ObjectProperty(None)
-    # ltex = ObjectProperty(None)
-    # rtex = ObjectProperty(None)
 
     # dictionary that stores contents, numeric values = [0-empty, 1-threshold, 2-maskedthreshold 3-threshnoresp, 4maskenoresp],[ 0-no note,1-note1, 2-note2, 3-note3]]
     contents = DictProperty({'LAC': [0, 0], 'RAC': [0, 0], 'LBC': [0, 0], 'RBC': [0, 0]})
@@ -126,6 +158,7 @@ class AudioButton(Button):
     def changeImage(self):
         currentSymbol = App.get_running_app().controllerOutput
         print currentSymbol
+
 
         # adds the symbol to the Button dictProperty "contents"
         # print reCodeStringToButton(currentSymbol)
@@ -156,8 +189,10 @@ class AudioButton(Button):
 
 
     def on_touch_down(self, touch):
+
+
         if (self.collide_point(*touch.pos) and touch.is_double_tap == False
-            and self.parent.parent.parent.parent.parent.parent.parent.parent.ids.drawlineDrawer.collapse == False):
+            and self.parent.parent.parent.parent.parent.parent.parent.ids.drawlineDrawer.collapse == False):
             print('my precious you found the parent')
 
             # with self.parent.parent.parent.parent.parent.parent.parent.parent.canvas:
@@ -210,7 +245,7 @@ class AudioButton(Button):
         return
 
     def on_touch_move(self, touch):
-        if (self.parent.parent.parent.parent.parent.parent.parent.parent.ids.drawlineDrawer.collapse == False
+        if (self.parent.parent.parent.parent.parent.parent.parent.ids.drawlineDrawer.collapse == False
             and self.collide_point(*touch.pos)):
 
             # add logic to change line colour if NR to clear
@@ -258,10 +293,38 @@ class AudiogramW(Widget):
 
 class PatientDetails(Widget):
     # takes input for the patient database
-    nameLabel = StringProperty("")
-    surnameLabel = StringProperty("")
-    dateOfBirth = StringProperty("")
-    sexLabel = StringProperty("")
+    patientName = ListProperty(["", ""])
+    patientDOB = ListProperty(['', '', ''])
+    patientSex = StringProperty('')
+    patientFile = StringProperty()
+
+    def updatePatientDOB(self, dd='dd', mm='mm', yyyy='yyyy'):
+        # print self.parent.parent.parent.ids #finding the parent
+        if dd.isdigit():
+            self.patientDOB[0] = 'D.O.B.: ' + str(dd)
+
+        if mm.isdigit():
+            self.patientDOB[1] = '/' + str(mm)
+
+        if yyyy.isdigit():
+            self.patientDOB[2] = '/' + str(yyyy)
+
+    def addlabeltext(self):
+
+        patientLabelText = (
+        " Patient: " + str(self.patientName[0]) + ' ' + str(self.patientName[1]) + '   ' + self.patientSex + '   ' +
+        self.patientDOB[0] + self.patientDOB[1] + self.patientDOB[2] + '      ' + self.patientFile)
+
+        self.parent.parent.parent.ids.audio_screen.patientLabel.text = patientLabelText
+
+
+class SpeechInput(Widget):
+    speechInputID = ObjectProperty(None)
+
+
+
+
+
 
 
 class Controller(Widget):
@@ -269,6 +332,7 @@ class Controller(Widget):
     controlID = ObjectProperty(None)
     controllerNR = ObjectProperty(None)
     controllerNote = ObjectProperty(None)
+    mipmap = True
 
     def getControllerInput(self, symbol):
         # reinit the list on button press - but keep notes and NR
@@ -353,45 +417,13 @@ class Controller(Widget):
             App.get_running_app().controllerOutput[6] = no_response_text
             App.get_running_app().controllerOutput[2] = '--'
 
-        print App.get_running_app().controllerOutput
+            # print App.get_running_app().controllerOutput
 
-        print(state)
+            #print(state)
 
         # get input from widgets and pass to the audiogram button widgets
 
 
-class MainScreen(TabbedPanel):
-    current_audiogram = ObjectProperty()
-    drawlineDrawer = ObjectProperty()
-    patientFirstName = StringProperty()
-    patientSecondName = StringProperty()
-    patientDOB = StringProperty()
-    patientSex = StringProperty()
-
-    def searchAndDestroy(self, akey, alist):
-
-        for dict_element in alist:
-            if akey in dict_element:
-                dict_element[akey].points = []
-
-        return alist
-
-    def save_audiogram(self):
-        self.current_audiogram.export_to_png('testpng.png')
-
-    def getLineType(self, input):
-        App.get_running_app().lineType = input
-
-    def clearRedLine(
-            self):  # not working as this clears each time maybe introduce a couple of canvases for the lines that can just be cleared
-        # or update the dict rather than overight it each time the method is called maybe it needs to be a list of dicts
-
-        # print App.get_running_app().linesDict
-        App.get_running_app().linesDictList = self.searchAndDestroy('redline', App.get_running_app().linesDictList)
-
-    def clearBlueLine(self):
-        App.get_running_app().linesDictList = self.searchAndDestroy('blueline', App.get_running_app().linesDictList)
-    pass
 
 
 class DrawAudioApp(App):
@@ -403,10 +435,12 @@ class DrawAudioApp(App):
     linesDictList = ListProperty()
 
 
+
+
+
     def build(self):
-        return MainScreen()
-        # return AudiogramW()
-        # return DatePicker()
+        return
+
 
 
 if __name__ == '__main__':

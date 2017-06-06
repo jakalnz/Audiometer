@@ -609,9 +609,12 @@
 <PatientDetails>:
     BoxLayout:
         id:details
-        size:root.size
+        size:root.width, root.height/2
         pos:root.pos
         orientation:'vertical'
+
+
+
 
         GridLayout:
             id: demographics
@@ -637,10 +640,13 @@
                 id:first_name
                 write_tab: False
                 multiline: False
+                on_text: root.patientName[0] = self.text; root.addlabeltext()
             TextInput:
                 id:surname
+                height: self.minimum_height
                 write_tab: False
                 multiline: False
+                on_text: root.patientName[1] = self.text; root.addlabeltext()
             Label:
                 size_hint_x:0.3
             # DOB  LABEL
@@ -682,19 +688,25 @@
                 TextInput:
                     id:dob_day
                     size_hint_x:0.2
+                    input_filter:'int'
                     write_tab: False
                     multiline: False
+                    on_text: root.updatePatientDOB(dd = self.text); root.addlabeltext()#root.patientDOB[0] = '    D.O.B.: ' + self.text
 
                 TextInput:
                     id:dob_month
                     size_hint_x:0.2
+                    input_filter:'int'
                     write_tab: False
                     multiline: False
+                    on_text:  root.updatePatientDOB(mm = self.text); root.addlabeltext()#root.patientDOB[1] = '/' + self.text
                 TextInput:
                     id:dob_year
+                    input_filter:'int'
                     size_hint_x:0.6
                     write_tab: False
                     multiline: False
+                    on_text:  root.updatePatientDOB(yyyy = self.text); root.addlabeltext()#root.patientDOB[2] = '/' + self.text
 
             #GENDER INPUT
             BoxLayout:
@@ -705,10 +717,12 @@
                 CheckBox:
                     id:chk_male
                     group:'gender'
+                    on_active:root.patientSex = ' (M) '; root.addlabeltext()
                     #size_hint_x:0.2
                 CheckBox:
                     id:chk_female
                     group:'gender'
+                    on_active:root.patientSex = ' (F) '; root.addlabeltext()
                     #size_hint_x:0.2
                 Label:
                     #size_hint_x:0.3
@@ -730,6 +744,7 @@
                 id: file_number
                 write_tab: False
                 multiline: False
+                on_text: root.patientFile = self.text; root.addlabeltext()
             Label:
                 size_hint_x:0.12
             Label:
@@ -741,6 +756,7 @@
                 multiline: False
             Label:
                 size_hint_x:0.12
+
 
 
 
@@ -760,7 +776,15 @@
             size_hint_y:.1
         GridLayout:
 
-            cols:2
+            cols:3
+
+            Label:
+                text:'Right'
+
+            Label:
+
+            Label:
+                text:'Left'
 
             ToggleButton
                 id:ra-
@@ -771,8 +795,17 @@
                         size:self.size
                         pos:self.pos
                         source:'Icons/RAC.png'
+                mipmap: self.parent.parent.parent.mipmap
+
+            Label:
+                text_size: self.size
+                halign: 'center'
+                valign:'middle'
+                text:'Air'
+
             ToggleButton
                 id:la-
+                mipmap: self.parent.parent.parent.mipmap
                 group:type
                 on_press:root.getControllerInput('la-')
                 canvas.after:
@@ -780,18 +813,29 @@
                         size:self.size
                         pos:self.pos
                         source:'Icons/LAC.png'
+
             ToggleButton
                 id:ram
                 group:type
+                mipmap: self.parent.parent.parent.mipmap
                 on_press:root.getControllerInput('ram')
                 canvas.after:
                     Rectangle:
                         size:self.size
                         pos:self.pos
                         source:'Icons/M-RAC.png'
+
+            Label:
+                text_size: self.size
+                halign: 'center'
+                valign:'middle'
+                font_size:10
+                text:'Masked\nAir'
+
             ToggleButton
                 id:lam
                 group:type
+                mipmap: self.parent.parent.parent.mipmap
                 on_press:root.getControllerInput('lam')
                 canvas.after:
                     Rectangle:
@@ -802,15 +846,24 @@
             ToggleButton
                 id:rb-
                 group:type
+                mipmap: self.parent.parent.parent.mipmap
                 on_press:root.getControllerInput('rb-')
                 canvas.after:
                     Rectangle:
                         size:self.size
                         pos:self.pos
                         source:'Icons/RBC.png'
+
+            Label:
+                text:'Bone'
+                text_size: self.size
+                halign: 'center'
+                valign:'middle'
+
             ToggleButton
                 id:lb-
                 group:type
+                mipmap: self.parent.parent.parent.mipmap
                 on_press:root.getControllerInput('lb-')
                 canvas.after:
                     Rectangle:
@@ -820,15 +873,25 @@
             ToggleButton
                 id:rbm
                 group:type
+                mipmap: self.parent.parent.parent.mipmap
                 on_press:root.getControllerInput('rbm')
                 canvas.after:
                     Rectangle:
                         size:self.size
                         pos:self.pos
                         source:'Icons/M-RBC.png'
+
+            Label:
+                text:'[size=10]Masked\nBone[/size]'
+                text_size:self.size
+                markup:'True'
+                #font_size:
+                halign: 'center'
+                valign:'middle'
             ToggleButton
                 id:lbm
                 group:type
+                mipmap: self.parent.parent.parent.mipmap
                 on_press:root.getControllerInput('lbm')
                 canvas.after:
                     Rectangle:
@@ -872,94 +935,233 @@
             text:'Good'
             values:['Good','Fair', 'Poor']
 
-<MainScreen>:
+<SpeechInput>:
+    id:'default'
+
+    BoxLayout
+
+        size:root.size
+        pos:root.pos
+        GridLayout:
+            cols:3
+
+
+            Label:
+                text:'Level \n(dBHL)'
+            Label:
+                text:'Score\n(%)'
+            Label:
+                text:'Masked'
+            TextInput:
+                id:speech_level_1
+            TextInput:
+                id:speech_score_1
+            CheckBox:
+                id:masked_speech_1
+            TextInput:
+                id:speech_level_2
+            TextInput:
+                id:speech_score_2
+            CheckBox:
+                id:masked_speech_2
+            TextInput:
+                id:speech_level_3
+            TextInput:
+                id:speech_score_3
+            CheckBox:
+                id:masked_speech_3
+            TextInput:
+                id:speech_level_4
+            TextInput:
+                id:speech_score_4
+            CheckBox:
+                id:masked_speech_4
+
+ScreenManager:
+    id:sm
+    PatientScreen:
+        id:patient_screen
+        name:'patient'
+    AudioScreen:
+        id:audio_screen
+        name:'audio'
+    SpeechScreen:
+        id:speech_screen
+        name:'speech'
+    ImmittanceScreen:
+        id:immittance_screen
+        name:'immittance'
+    ReportScreen:
+        id:report_screen
+        name:'report'
+
+
+
+<NavigationBar>:
+    pos_hint: {'top':1}
+    #
+    ActionView:
+        ActionPrevious:
+        ActionButton:
+            text:'Patient'
+            on_press:root.parent.parent.manager.current = 'patient'
+        ActionButton:
+            text:'Audiogram'
+            on_press:root.parent.parent.manager.current = 'audio'
+        ActionButton:
+            text:'Speech'
+            on_press:root.parent.parent.manager.current = 'speech'
+        ActionButton:
+            text:'Immittance'
+            on_press:root.parent.parent.manager.current = 'immittance'
+        ActionButton:
+            text:'Report'
+            on_press:root.parent.parent.manager.current = 'report'
+
+
+
+<PatientScreen>:
+    id:info
+
+    #size:root.size #is this needed
+    patientInput:patientInput
+    BoxLayout:
+        #size:root.size
+        orientation:'vertical'
+
+        NavigationBar:
+            size_hint: (1., 0.1)
+        PatientDetails:
+            id:patientInput
+
+
+<AudioScreen>:
+    #size:root.size  #is this needed
+    id:audio
     current_audiogram:current_audiogram
     drawlineDrawer:drawlineDrawer
-    size:root.size
-    do_default_tab: False
-    tab_width: self.size[0]/len(self.tab_list)
-    TabbedPanelItem:
-        text:'Patient Information'
-        BoxLayout:
-            PatientDetails:
-    TabbedPanelItem:
-        text:'Audiogram'
-        BoxLayout:
-            id:current_audiogram
-            size:root.size
-            orientation:'vertical'
+    patientLabel:patientLabel
+
+
+    BoxLayout:
+        id:current_audiogram
+        size:root.size
+        orientation:'vertical'
+
+        NavigationBar:
+            size_hint: (1., 0.1)
+        Label:
+            id:patientLabel
+            size_hint:(1.,0.1)
+            valign: 'middle'
+            halign:'left'
+            text_size: self.size
+            text: ''#root.update_patient_label()
+        GridLayout:
+            #size:root.size
+            #pos:root.pos
+            rows:1
+
+            AudiogramW:
+
+            Accordion:
+                size_hint_x:.25
+                orientation:'vertical'
+
+
+                AccordionItem:
+                    id:drawlineDrawer
+                    title:'Mark Lines'
+
+                    BoxLayout:
+                        orientation:'vertical'
+                        ToggleButton
+                            id:redline
+                            group:'draw'
+                            on_press:root.getLineType('right')
+                            text:'red line'
+
+                        ToggleButton
+                            id:blueline
+                            group:'draw'
+                            on_press:root.getLineType('left')
+                            text:'blue line'
+
+                        Button
+                            id:clearred
+                            text: 'Clear Red Line'
+                            on_press: root.clearRedLine()
+
+                        Button
+                            id:clearblue
+                            text: 'Clear Blue Line'
+                            on_press: root.clearBlueLine() # method that clears the blue lines
+                AccordionItem:
+                    title:'Draw Symbols'
+                    Controller
+        GridLayout:
+            size_hint_y:.1
+            pos:root.pos
+            rows:1
+            TextInput:
+                text:"Comments and Notes:"
+
+<SpeechScreen>:
+    BoxLayout:
+        orientation:'vertical'
+        NavigationBar:
+            size_hint: (1., 0.1)
+        GridLayout:
+            cols:2
             Label:
-                size_hint_y:.1
-                valign: 'middle'
-                halign:'left'
-                text_size: self.size
-                text:" Patient:"
+                text:'Audiogram png here'
+            Label:
+                text:'Speech Graph here'
+            Label:
 
-            GridLayout:
-                size:root.size
-                pos:root.pos
-                rows:1
+                canvas.before:
+                    Color:
+                        rgb: 1, 0, 0 # your color here
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
 
-                AudiogramW:
+                text:'Speech Right'
+                size_hint_y:0.1
+            Label:
+                canvas.before:
+                    Color:
+                        rgb: 0, 0, 1 # your color here
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                text:'Speech Left'
+                size_hint_y:0.1
+            SpeechInput:
+                id:right
 
-#                Controller:
-#                    size_hint_x:.2
-                Accordion:
-                    size_hint_x:.2
-                    orientation:'vertical'
-
-
-                    AccordionItem:
-                        id:drawlineDrawer
-                        title:'Mark Lines'
-
-                        BoxLayout:
-                            orientation:'vertical'
-                            ToggleButton
-                                id:redline
-                                group:'draw'
-                                on_press:root.getLineType('right')
-                                text:'red line'
-
-                            ToggleButton
-                                id:blueline
-                                group:'draw'
-                                on_press:root.getLineType('left')
-                                text:'blue line'
-
-                            Button
-                                id:clearred
-                                text: 'Clear Red Line'
-                                on_press: root.clearRedLine()
-
-                            Button
-                                id:clearblue
-                                text: 'Clear Blue Line'
-                                on_press: root.clearBlueLine() # method that clears the blue lines
-                    AccordionItem:
-                        title:'Draw Symbols'
-                        Controller
+            SpeechInput:
+                id:left
 
 
 
-            GridLayout:
-                size_hint_y:.1
-                pos:root.pos
-                rows:1
+<ImmittanceScreen>:
+    BoxLayout:
+        orientation:'vertical'
+        NavigationBar:
+            size_hint: (1., 0.1)
+        Label:
+            text:'Immittance Testing goes here'
 
+<ReportScreen>:
+    BoxLayout:
+        orientation:'vertical'
+        id:ReportMaker
+        NavigationBar:
+            size_hint: (1., 0.1)
 
-                TextInput:
-                    text:"Comments and Notes:"
+        Button:
+            id:print_audiogram_btn
+            text:'Save Audiogram as PNG'
+            on_press:root.save_audiogram()
 
-    TabbedPanelItem:
-        text:'Speech'
-    TabbedPanelItem:
-        text:'Immittance'
-    TabbedPanelItem:
-        text:'Report'
-        BoxLayout:
-            id:ReportMaker
-            Button:
-                id:print_audiogram_btn
-                text:'Save Audiogram as PNG'
-                on_press:root.save_audiogram()
