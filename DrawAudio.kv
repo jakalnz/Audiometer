@@ -938,8 +938,7 @@
 <SpeechInput>:
     id:'default'
 
-    BoxLayout
-
+    BoxLayout:
         size:root.size
         pos:root.pos
         GridLayout:
@@ -976,6 +975,68 @@
                 id:speech_score_4
             CheckBox:
                 id:masked_speech_4
+
+<TympInput>:
+    id:default
+    BoxLayout:
+        size:root.size
+        pos:root.pos
+        GridLayout:
+            cols:3
+            Label:
+                text:'Right'
+            Label:
+                text:''
+            Label:
+                text:'Left'
+            BoxLayout:
+                size:root.size
+                pos:root.pos
+                Spinner:
+                    id:r-type
+                    text:'A'
+                    values:'A','B','C'
+                Spinner:
+                    id:r-mod
+                    text:''
+                    values:'','deep','shallow','high','low'
+            Label:
+                text:'Type'
+            BoxLayout:
+                size:root.size
+                pos:root.pos
+                Spinner:
+                    id:l-type
+                    text:'A'
+                    values:'A','B','C'
+                Spinner:
+                    id:l-mod
+                    text:''
+                    values:'','deep','shallow','high','low'
+            TextInput:
+                id:r-MEP
+            Label:
+                text:'MEP\ndAPa'
+            TextInput:
+                id:l-MEP
+            TextInput:
+                id:r-Adm
+            Label:
+                text:'Com.\nml'
+            TextInput:
+                id:l-Adm
+            TextInput:
+                id:r-Vol
+            Label:
+                text:'Vol\nml'
+            TextInput:
+                id:l-Vol
+            TextInput:
+                id:r-Width
+            Label:
+                text:'Width\ndAPa'
+            TextInput:
+                id:l-Width
 
 ScreenManager:
     id:sm
@@ -1150,8 +1211,13 @@ ScreenManager:
         orientation:'vertical'
         NavigationBar:
             size_hint: (1., 0.1)
-        Label:
-            text:'Immittance Testing goes here'
+        GridLayout:
+            cols:2
+            TympInput:
+                tympInput:tympInput
+                id:tympInput
+            Label:
+                text:'Reflexes'
 
 <ReportScreen>:
     BoxLayout:

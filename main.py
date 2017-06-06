@@ -322,6 +322,10 @@ class SpeechInput(Widget):
     speechInputID = ObjectProperty(None)
 
 
+class TympInput(Widget):
+    tympInputID = ObjectProperty(None)
+
+
 
 
 
