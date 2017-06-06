@@ -5,21 +5,18 @@
 from itertools import izip as zip
 
 from kivy.app import App
-from kivy.garden.roulette import Roulette, CyclicRoulette
+# from kivy.garden.roulette import Roulette, CyclicRoulette
 from kivy.graphics import Color, Line
 from kivy.properties import ObjectProperty, DictProperty, NumericProperty, StringProperty, ListProperty
 from kivy.uix.actionbar import ActionBar
-from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
-from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.screenmanager import Screen
 from kivy.uix.widget import Widget
 
 get_indexes = lambda x, xs: [i for (y, i) in zip(xs, range(len(xs))) if x == y]
 
-sm = ScreenManager()
 
 
-# Window.clearcolor = (1, 1, 1, 1)
 
 # Make a Navigation Bar
 
@@ -145,20 +142,6 @@ def ButtonDictToString(value):
     return [RBCcode, ACcode, LBCcode]
 
 
-class PickDate(BoxLayout):
-    def __init__(self, **kwargs):
-        # make sure we aren't overriding any important functionality
-        super(PickDate, self).__init__(**kwargs)
-
-        # let's add a Widget to this layout
-
-        self.add_widget(CyclicRoulette(cycle=30, density=2.8, zero_indexed=False))
-        self.add_widget(CyclicRoulette(cycle=12, density=2.8, zero_indexed=False))
-        self.add_widget(Roulette(density=2.8, selected_value=1980))
-        # self.add_widget(Roulette(density=4.0, selected_value=1980))
-
-
-
 # buttons create
 class AudioButton(Button):
     level = NumericProperty(0)
@@ -167,9 +150,6 @@ class AudioButton(Button):
     rightboneconduction = ObjectProperty(None)
     leftboneconduction = ObjectProperty(None)
     mipmap = True
-    # ctex = ObjectProperty(None)
-    # ltex = ObjectProperty(None)
-    # rtex = ObjectProperty(None)
 
     # dictionary that stores contents, numeric values = [0-empty, 1-threshold, 2-maskedthreshold 3-threshnoresp, 4maskenoresp],[ 0-no note,1-note1, 2-note2, 3-note3]]
     contents = DictProperty({'LAC': [0, 0], 'RAC': [0, 0], 'LBC': [0, 0], 'RBC': [0, 0]})
@@ -338,6 +318,9 @@ class PatientDetails(Widget):
         self.parent.parent.parent.ids.audio_screen.patientLabel.text = patientLabelText
 
 
+class SpeechInput(Widget):
+    speechInputID = ObjectProperty(None)
+
 
 
 
@@ -349,6 +332,7 @@ class Controller(Widget):
     controlID = ObjectProperty(None)
     controllerNR = ObjectProperty(None)
     controllerNote = ObjectProperty(None)
+    mipmap = True
 
     def getControllerInput(self, symbol):
         # reinit the list on button press - but keep notes and NR
