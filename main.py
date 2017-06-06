@@ -7,7 +7,6 @@ from itertools import izip as zip
 from kivy.app import App
 from kivy.garden.roulette import Roulette, CyclicRoulette
 from kivy.graphics import Color, Line
-from kivy.lang import Builder
 from kivy.properties import ObjectProperty, DictProperty, NumericProperty, StringProperty, ListProperty
 from kivy.uix.actionbar import ActionBar
 from kivy.uix.boxlayout import BoxLayout
@@ -434,61 +433,13 @@ class Controller(Widget):
             App.get_running_app().controllerOutput[6] = no_response_text
             App.get_running_app().controllerOutput[2] = '--'
 
-        print App.get_running_app().controllerOutput
+            # print App.get_running_app().controllerOutput
 
-        print(state)
+            #print(state)
 
         # get input from widgets and pass to the audiogram button widgets
 
 
-# class MainScreen(TabbedPanel):
-#     patientInput = ObjectProperty()
-#     current_audiogram = ObjectProperty()
-#     drawlineDrawer = ObjectProperty()
-#     patientLabel = ObjectProperty()
-#
-#     #
-#
-#
-#     def searchAndDestroy(self, akey, alist):
-#
-#         for dict_element in alist:
-#             if akey in dict_element:
-#                 dict_element[akey].points = []
-#
-#         return alist
-#
-#     # def fillPatientDetails(self, firstname, secondname, dd, mm, yyyy, gender, filenum, email):
-#     #     #
-#
-#     def save_audiogram(self):
-#         self.current_audiogram.export_to_png('testpng.png')
-#
-#     def getLineType(self, input):
-#         App.get_running_app().lineType = input
-#
-#     def clearRedLine(
-#             self):  # not working as this clears each time maybe introduce a couple of canvases for the lines that can just be cleared
-#         # or update the dict rather than overight it each time the method is called maybe it needs to be a list of dicts
-#
-#         # print App.get_running_app().linesDict
-#         App.get_running_app().linesDictList = self.searchAndDestroy('redline', App.get_running_app().linesDictList)
-#
-#     def clearBlueLine(self):
-#         App.get_running_app().linesDictList = self.searchAndDestroy('blueline', App.get_running_app().linesDictList)
-#     pass
-
-# Create screen manager
-
-
-# sm.add_widget(PatientScreen(name='patient'))
-# sm.add_widget(AudioScreen(name='audio'))
-# sm.add_widget(SpeechScreen(name='speech'))
-# sm.add_widget(ImmittanceScreen(name='immittance'))
-# sm.add_widget(ReportScreen(name='report'))
-# sm.current = 'audio'
-
-buildKV = Builder.load_file("DrawAudio.kv")
 
 
 class DrawAudioApp(App):
@@ -498,27 +449,14 @@ class DrawAudioApp(App):
     clearRed = ObjectProperty()
     clearBlue = ObjectProperty()
     linesDictList = ListProperty()
-    patientdetails = StringProperty()
 
-    # patientName = ListProperty(['', ''])
 
 
 
 
     def build(self):
-        # sm.add_widget(PatientScreen(name='patient'))
-        # sm.add_widget(AudioScreen(name='audio'))
-        # sm.add_widget(SpeechScreen(name='speech'))
-        # sm.add_widget(ImmittanceScreen(name='immittance'))
-        # sm.add_widget(ReportScreen(name='report'))
-        # sm.current = 'patient'
-        # return sm
-        return buildKV
+        return
 
-        # return AudioScreen()
-        #return MainScreen()
-        # return AudiogramW()
-        # return DatePicker()
 
 
 if __name__ == '__main__':
