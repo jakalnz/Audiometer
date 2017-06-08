@@ -1038,6 +1038,89 @@
             TextInput:
                 id:l-Width
 
+<CustomDropDown>:
+    Button:
+        text: 'My first Item'
+        size_hint_y: None
+        height: 44
+        on_release: root.select('item1')
+    Label:
+        text: 'Unselectable item'
+        size_hint_y: None
+        height: 44
+    Button:
+        text: 'My second Item'
+        size_hint_y: None
+        height: 44
+        on_release: root.select('item2')
+
+
+<ReflexType>:
+    dropDownID:dropDownID
+
+    Button:
+        id:empty
+        text:'empty'
+        size_hint_y:None
+        height: '48dp'
+        on_release: dropDownID.select('item1')
+        canvas.after:
+            Rectangle:
+                source:'Images/reflexes/tick.png'
+                size:self.size
+                pos:self.pos
+
+        Button:
+            id:present
+            text:'present'
+            size_hint_y:None
+            height: '48dp'
+            on_release: dropDownID.select('item2')
+            canvas.after:
+                Rectangle:
+                    source:'Images/reflexes/ABN.png'
+                    size:self.size
+                    pos:self.pos
+#    Image:
+#        id:elevated
+#        source:'Images/reflexes/Elevated WB.png'
+#        size:root.size
+#        pos:root.pos
+#    Image:
+#        id:absent
+#        source:'Images/reflexes/Absent.png'
+#        size:root.size
+#        pos:root.pos
+#    Image:
+#        id:abnormal
+#        source:'Images/reflexes/Abn.png'
+#        size:root.size
+#        pos:root.pos
+#    Image:
+#        id:CNT
+#        source:'Images/reflexes/CNT.png'
+#        size:root.size
+#        pos:root.pos
+#    Image:
+#        id:DNT
+#        source:'Images/reflexes/DNT.png'
+#        size:root.size
+#        pos:root.pos
+
+<ReflexInput>:
+    id:default
+    BoxLayout:
+        orientation:'vertical'
+        size:root.size
+        pos:root.pos
+        Label:
+            text:'Acoustic Reflexes'
+        ReBut:
+            text:''
+
+
+
+
 ScreenManager:
     id:sm
     PatientScreen:
@@ -1216,8 +1299,8 @@ ScreenManager:
             TympInput:
                 tympInput:tympInput
                 id:tympInput
-            Label:
-                text:'Reflexes'
+            ReflexInput:
+
 
 <ReportScreen>:
     BoxLayout:

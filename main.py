@@ -16,13 +16,21 @@ from kivy.graphics import Color, Line
 from kivy.properties import ObjectProperty, DictProperty, NumericProperty, StringProperty, ListProperty
 from kivy.uix.actionbar import ActionBar
 from kivy.uix.button import Button
+from kivy.uix.dropdown import DropDown
 from kivy.uix.screenmanager import Screen
 from kivy.uix.widget import Widget
 
 get_indexes = lambda x, xs: [i for (y, i) in zip(xs, range(len(xs))) if x == y]
 
 
+# class ReflexTypeBub(Bubble):
+#     pass
 
+# class BubBut(Button):
+#
+#     def show_bubble(self):
+#         self.bubb = bubb = ReflexTypeBub()
+#         self.add_widget(bubb)
 
 # Make a Navigation Bar
 
@@ -331,6 +339,33 @@ class SpeechInput(Widget):
 class TympInput(Widget):
     tympInputID = ObjectProperty(None)
 
+
+class ReflexInput(Widget):
+    reflexInputID = ObjectProperty(None)
+
+
+class ReflexType(DropDown):
+    pass
+
+
+class ReBut(Button):
+    dropper = ObjectProperty()
+
+    def __init__(self, **kwargs):
+        super(ReBut, self).__init__(**kwargs)
+        self.reflex_type_list = None
+        self.reflex_type_list = DropDown()
+
+        types = ['CNT', 'DNT', 'Present', 'Abnormal', 'Elevated', 'Blank']
+
+        for i in types:
+            # print(i)
+            btn = Button(text=i, size_hint_y=None, height=50)
+            btn.bind(on_release=lambda btn: self.reflex_type_list.select(btn.text))
+            self.reflex_type_list.add_widget(btn)
+
+        self.bind(on_release=self.reflex_type_list.open)
+        self.reflex_type_list.bind(on_select=lambda instance, x: setattr(self, 'text', x))
 
 
 
