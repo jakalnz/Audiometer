@@ -4,6 +4,8 @@ TO DO:
     1. Add Technique for Audiometry - Std, CPA, VRA, 
     2. In Speech have Material [Spondee, CVC, HINT, MLV], Score Type [SDT, SRT,PRT,WRT, MCL, UCL], ?SNR, also comments section
     3. Add images for ART
+    3b. for ART input have popup widget with roulette (default 90 +5), select present or noreponse or cancel passes info to
+        a custom widget textinput and small label which shows elevated symbol or just type NR which is easier
     4. Report
     '''
 
@@ -17,20 +19,12 @@ from kivy.properties import ObjectProperty, DictProperty, NumericProperty, Strin
 from kivy.uix.actionbar import ActionBar
 from kivy.uix.button import Button
 from kivy.uix.dropdown import DropDown
+from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import Screen
 from kivy.uix.widget import Widget
 
 get_indexes = lambda x, xs: [i for (y, i) in zip(xs, range(len(xs))) if x == y]
 
-
-# class ReflexTypeBub(Bubble):
-#     pass
-
-# class BubBut(Button):
-#
-#     def show_bubble(self):
-#         self.bubb = bubb = ReflexTypeBub()
-#         self.add_widget(bubb)
 
 # Make a Navigation Bar
 
@@ -340,7 +334,28 @@ class TympInput(Widget):
     tympInputID = ObjectProperty(None)
 
 
-class ReflexInput(Widget):
+class TympDraw(Widget):
+    def on_touch_down(self, touch):
+        color = (0, 0, 0)
+        with self.canvas:
+            Color(*color)
+            d = 30.
+            # Ellipse(pos=(touch.x - d / 2, touch.y - d / 2), size=(d, d))
+            touch.ud['line'] = Line(points=(touch.x, touch.y))
+
+    def on_touch_move(self, touch):
+        touch.ud['line'].points += [touch.x, touch.y]
+
+
+class TympDrawCtrl(Widget):
+    pass
+
+
+class ReflexInputR(Widget):
+    reflexInputID = ObjectProperty(None)
+
+
+class ReflexInputL(Widget):
     reflexInputID = ObjectProperty(None)
 
 
@@ -349,28 +364,37 @@ class ReflexType(DropDown):
 
 
 class ReBut(Button):
-    dropper = ObjectProperty()
-
     def __init__(self, **kwargs):
         super(ReBut, self).__init__(**kwargs)
         self.reflex_type_list = None
-        self.reflex_type_list = DropDown()
 
-        types = ['CNT', 'DNT', 'Present', 'Abnormal', 'Elevated', 'Blank']
-
-        for i in types:
-            # print(i)
-            btn = Button(text=i, size_hint_y=None, height=50)
-            btn.bind(on_release=lambda btn: self.reflex_type_list.select(btn.text))
-            self.reflex_type_list.add_widget(btn)
-
+        self.reflex_type_list = ReflexType()
+        # self.reflex_type_list = DropDown() #old code for text drop down
+        # types = ['CNT', 'DNT', 'Present', 'Abnormal', 'Blank','Elevated']
+        #
+        #
+        # for i in types:
+        #     # print(i)
+        #
+        #     btn = Button(text=i, size_hint_y=None, height=50)
+        #     btn.bind(on_release=lambda btn: self.reflex_type_list.select(btn.text))
+        #     with btn.canvas:
+        #         btn.rect = Rectangle(pos=self.pos, size = (self.height,self.height), source = 'Images/reflexes/'+i+'.png')
+        #         btn.bind(pos=self.update_rect, size=self.update_rect)
+        #     self.reflex_type_list.add_widget(btn)
         self.bind(on_release=self.reflex_type_list.open)
-        self.reflex_type_list.bind(on_select=lambda instance, x: setattr(self, 'text', x))
+        self.background_normal = 'Images/reflexes/Blank.png'
+        self.background_color = (1, 1, 1, 1)
+        self.border = (1, 1, 1, 1)
+        # self.reflex_type_list.bind(on_select=lambda instance, x: setattr(self, 'text', x))
+        self.reflex_type_list.bind(on_select=lambda instance, x: setattr(self, 'background_normal', x))
 
 
-
-
-
+class RePop(Popup):
+    def __init__(self, **kwargs):
+        self.caller = kwargs.get('caller')
+        super(RePop, self).__init__(**kwargs)
+        print self.caller
 
 class Controller(Widget):
     # select symbols and modifiers, print, and save,load dialog, erase, clear and line markup
