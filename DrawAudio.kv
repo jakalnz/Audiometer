@@ -942,56 +942,97 @@
         size:root.size
         pos:root.pos
         GridLayout:
-            cols:3
+            cols:6
 
-
+            Label:
+                text:'Material'
+            Label:
+                text:'Type'
             Label:
                 text:'Level \n(dBHL)'
             Label:
                 text:'Score\n(%)'
             Label:
+                text:'SNR'
+            Label:
                 text:'Masked'
+            Spinner:
+                text:'CVC'
+                values:['CVC','MLV','Spondee', 'HINT']
+            Spinner:
+                text:'SRT'
+                values:['SDT', 'SRT', 'WRT', 'MCL', 'UCL']
             TextInput:
                 id:speech_level_1
             TextInput:
                 id:speech_score_1
+            TextInput:
+                id:SNR
             CheckBox:
                 id:masked_speech_1
+            Spinner:
+                text:'CVC'
+                values:['CVC','MLV','Spondee', 'HINT']
+            Spinner:
+                text:'SRT'
+                values:['SDT', 'SRT', 'WRT', 'MCL', 'UCL']
             TextInput:
                 id:speech_level_2
             TextInput:
                 id:speech_score_2
+            TextInput:
+                id:SNR
             CheckBox:
                 id:masked_speech_2
+            Spinner:
+                text:'CVC'
+                values:['CVC','MLV','Spondee', 'HINT']
+            Spinner:
+                text:'SRT'
+                values:['SDT', 'SRT', 'WRT', 'MCL', 'UCL']
             TextInput:
                 id:speech_level_3
             TextInput:
                 id:speech_score_3
+            TextInput:
+                id:SNR
             CheckBox:
                 id:masked_speech_3
+            Spinner:
+                text:'CVC'
+                values:['CVC','MLV','Spondee', 'HINT']
+            Spinner:
+                text:'SRT'
+                values:['SDT', 'SRT', 'WRT', 'MCL', 'UCL']
             TextInput:
                 id:speech_level_4
             TextInput:
                 id:speech_score_4
+            TextInput:
+                id:SNR
             CheckBox:
                 id:masked_speech_4
 
 <TympDrawCtrl>:
-    id:TympDrawingController
+
     BoxLayout:
         size:root.size
         pos:root.pos
         ToggleButton:
             text:'Draw Right'
             group:'l-r-sel'
+            on_press:root.selectedTymp ='right'
         ToggleButton:
             text:'Draw Left'
             group:'l-r-sel'
+            on_press:root.selectedTymp = 'left'
         Button:
             text:'Clear Selected'
+            on_press:root.parent.parent.ids.tympDrawID.clearLine()
 
 <TympDraw>:
     id:default
+
     canvas.before:
         Rectangle:
             size:self.size
@@ -999,14 +1040,19 @@
             source:'Images/reflexes/TympCanvas.png'
 
 <TympInput>:
-    id:default
 
+    tympInputID: tympInputID
+    tympDrawCtrlID:tympDrawCtrlID
+    tympDrawID:tympDrawID
+    id:tympInputID
     BoxLayout:
         size:root.size
         pos:root.pos
         orientation:'vertical'
         TympDraw:
+            id:tympDrawID
         TympDrawCtrl:
+            id:tympDrawCtrlID
             size_hint:(1,0.1)
         GridLayout:
             cols:3
@@ -1162,9 +1208,10 @@
             #row_default_height:20
             Label:
                 text:'0.5kHz'
+                color:[0,0,0,1]
                 canvas.before:
                     Color:
-                        rgba: 1, 0, 0,.5 # your color here
+                        rgba: 1, 1, 1, 1 # your color here
                     Rectangle:
                         pos: self.pos
                         size: self.size
@@ -1178,9 +1225,10 @@
             ReBut:
             Label:
                 text:'1kHz'
+                color:[0,0,0,1]
                 canvas.before:
                     Color:
-                        rgba: 1, 0, 0,.5 # your color here
+                        rgba: 1, 1, 1, 1 # your color here
                     Rectangle:
                         pos: self.pos
                         size: self.size
@@ -1192,9 +1240,10 @@
             ReBut:
             Label:
                 text:'2kHz'
+                color:[0,0,0,1]
                 canvas.before:
                     Color:
-                        rgba: 1, 0, 0,.5# your color here
+                        rgba: 1, 1, 1, 1# your color here
                     Rectangle:
                         pos: self.pos
                         size: self.size
@@ -1206,9 +1255,10 @@
             ReBut:
             Label:
                 text:'BBN'
+                color:[0,0,0,1]
                 canvas.before:
                     Color:
-                        rgba: 1, 0, 0,.5 # your color here
+                        rgba: 1, 1, 1, 1 # your color here
                     Rectangle:
                         pos: self.pos
                         size: self.size
@@ -1235,9 +1285,10 @@
 
             Label:
                 text:'0.5kHz'
+                color:[0,0,0,1]
                 canvas.before:
                     Color:
-                        rgba: 0, 0, 1,.5  # your color here
+                        rgba: 1, 1, 1, 1  # your color here
                     Rectangle:
                         pos: self.pos
                         size: self.size
@@ -1249,9 +1300,10 @@
 
             Label:
                 text:'1kHz'
+                color:[0,0,0,1]
                 canvas.before:
                     Color:
-                        rgba: 0, 0, 1,.5 # your color here
+                        rgba: 1, 1, 1, 1 # your color here
                     Rectangle:
                         pos: self.pos
                         size: self.size
@@ -1263,9 +1315,10 @@
 
             Label:
                 text:'2kHz'
+                color:[0,0,0,1]
                 canvas.before:
                     Color:
-                        rgba: 0, 0, 1,.5 # your color here
+                        rgba: 1, 1, 1, 1 # your color here
                     Rectangle:
                         pos: self.pos
                         size: self.size
@@ -1276,9 +1329,10 @@
                 font_size:11
             Label:
                 text:'BBN'
+                color:[0,0,0,1]
                 canvas.before:
                     Color:
-                        rgba: 0, 0, 1,.5 # your color here
+                        rgba: 1, 1, 1, 1# your color here
                     Rectangle:
                         pos: self.pos
                         size: self.size
@@ -1315,7 +1369,8 @@ ScreenManager:
             on_press:root.parent.parent.manager.current = 'audio'
         ActionButton:
             text:'Speech'
-            on_press:root.parent.parent.manager.current = 'speech'
+            #on_press:root.parent.parent.manager.current = 'speech'
+            on_press:root.goToSpeechScreen()
         ActionButton:
             text:'Immittance'
             on_press:root.parent.parent.manager.current = 'immittance'
@@ -1346,7 +1401,7 @@ ScreenManager:
     current_audiogram:current_audiogram
     drawlineDrawer:drawlineDrawer
     patientLabel:patientLabel
-
+    currentAudioChart:currentAudioChart
 
     BoxLayout:
         id:current_audiogram
@@ -1368,6 +1423,7 @@ ScreenManager:
             rows:1
 
             AudiogramW:
+                id:currentAudioChart
 
             Accordion:
                 size_hint_x:.25
@@ -1412,14 +1468,22 @@ ScreenManager:
                 text:"Comments and Notes:"
 
 <SpeechScreen>:
+    speechAudioID:speechAudioID
+    #speechAudioImage:speechAudioImage
     BoxLayout:
         orientation:'vertical'
         NavigationBar:
             size_hint: (1., 0.1)
         GridLayout:
             cols:2
-            Label:
-                text:'Audiogram png here'
+
+            Image:
+                id:speechAudioID
+                #size_hint: 1,1
+                pos: self.parent.parent.pos
+                source: root.speechAudioImage
+                allow_stretch:True
+                keep_ratio:False
             Label:
                 text:'Speech Graph here'
             Label:
@@ -1478,11 +1542,12 @@ ScreenManager:
                 GridLayout:
                     cols:3
                     Label:
+                        color:[0,0,0,1]
                         text:'Sound Right'
                         size_hint: (1., 0.15)
                         canvas.before:
                             Color:
-                                rgba: 1, 0, 0,.5# your color here
+                                rgba: 1, 1, 1,1# your color here
                             Rectangle:
                                 pos: self.pos
                                 size: self.size
@@ -1498,10 +1563,11 @@ ScreenManager:
                                 size: self.size
                     Label:
                         text:'Sound Left'
+                        color:[0,0,0,1]
                         size_hint: (1., 0.15)
                         canvas.before:
                             Color:
-                                rgba: 0, 0, 1,.5 # your color here
+                                rgba: 1, 1, 1,1 # your color here
                             Rectangle:
                                 pos: self.pos
                                 size: self.size
@@ -1521,11 +1587,11 @@ ScreenManager:
                 GridLayout:
                     cols:3
                     Label:
-                        text:'Sound Right'
+                        text:''
                         size_hint: (1., 0.15)
                         canvas.before:
                             Color:
-                                rgba: 1, 0, 0,.5 # your color here
+                                rgba: 1, 1, 1,1 # your color here
                             Rectangle:
                                 pos: self.pos
                                 size: self.size
@@ -1541,11 +1607,11 @@ ScreenManager:
                                 pos: self.pos
                                 size: self.size
                     Label:
-                        text:'Sound Left'
+                        text:''
                         size_hint: (1., 0.15)
                         canvas.before:
                             Color:
-                                rgba: 0, 0, 1,.5 # your color here
+                                rgba: 1, 1, 1,1 # your color here
                             Rectangle:
                                 pos: self.pos
                                 size: self.size

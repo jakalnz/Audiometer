@@ -30,6 +30,16 @@ get_indexes = lambda x, xs: [i for (y, i) in zip(xs, range(len(xs))) if x == y]
 
 
 class NavigationBar(ActionBar):
+    def generateAudioChart(self):
+        self.parent.parent.manager.get_screen('audio').currentAudioChart.export_to_png('tmp/audio.png')
+        print 'in gen audio'
+
+    def goToSpeechScreen(self):
+        self.generateAudioChart()
+        self.parent.parent.manager.get_screen('speech').speechAudioID.reload()
+        # self.manager.get_screen('audio').currentAudioChart.export_to_png('tmp/audio.png')
+        # self.root.parent.parent.manager.get_screen('audio').currentAudioChart.export_to_png('tmp/audio.png')
+        self.parent.parent.manager.current = 'speech'
     pass
 
 
@@ -44,6 +54,7 @@ class PatientScreen(Screen):
 
 class AudioScreen(Screen):
     current_audiogram = ObjectProperty()
+    currentAudioChart = ObjectProperty()
     drawlineDrawer = ObjectProperty()
     patientLabel = ObjectProperty()
 
@@ -72,6 +83,9 @@ class AudioScreen(Screen):
 
 
 class SpeechScreen(Screen):
+    speechAudioImage = StringProperty()
+    speechAudioImage = 'tmp/audio.png'
+    speechAudioID = ObjectProperty()
     pass
 
 
@@ -201,7 +215,7 @@ class AudioButton(Button):
 
         if (self.collide_point(*touch.pos) and touch.is_double_tap == False
             and self.parent.parent.parent.parent.parent.parent.parent.ids.drawlineDrawer.collapse == False):
-            print('my precious you found the parent')
+            #print('my precious you found the parent')
 
             # with self.parent.parent.parent.parent.parent.parent.parent.parent.canvas:
             with self.parent.parent.parent.canvas:
@@ -212,7 +226,7 @@ class AudioButton(Button):
                 elif App.get_running_app().lineType == 'left':
                     Color(0, 0, 1, 1)
                     touch.ud['blueline'] = Line(points=(self.center_x, self.center_y), dash_offset=5)
-
+                # adds the
                 App.get_running_app().linesDictList.append(touch.ud)
                 print 'touch.ud'
                 print touch.ud
@@ -330,24 +344,69 @@ class SpeechInput(Widget):
     speechInputID = ObjectProperty(None)
 
 
+    # Material[Spondee, CVC, HINT, MLV], Score
+    # Type[SDT, SRT, PRT, WRT, MCL, UCL], ?SNR, also
+    #comments
+
+
+
 class TympInput(Widget):
     tympInputID = ObjectProperty(None)
+    tympDrawID = ObjectProperty(None)
+    tympDrawCtrlID = ObjectProperty(None)
+
 
 
 class TympDraw(Widget):
     def on_touch_down(self, touch):
-        color = (0, 0, 0)
+
+        if self.parent.parent.ids.tympDrawCtrlID.selectedTymp is 'right':
+            color = (1, 0, 0)
+        elif self.parent.parent.ids.tympDrawCtrlID.selectedTymp is 'left':
+            color = (0, 0, 1)
+        else:
+            color = (1, 1, 1, 0)
         with self.canvas:
             Color(*color)
             d = 30.
             # Ellipse(pos=(touch.x - d / 2, touch.y - d / 2), size=(d, d))
-            touch.ud['line'] = Line(points=(touch.x, touch.y))
+            if self.parent.parent.ids.tympDrawCtrlID.selectedTymp is 'right':
+                touch.ud['tympRedline'] = Line(points=(touch.x, touch.y))
+            elif self.parent.parent.ids.tympDrawCtrlID.selectedTymp is 'left':
+                touch.ud['tympBlueline'] = Line(points=(touch.x, touch.y))
+
+            App.get_running_app().linesDictList.append(touch.ud)
 
     def on_touch_move(self, touch):
-        touch.ud['line'].points += [touch.x, touch.y]
+        if self.parent.parent.ids.tympDrawCtrlID.selectedTymp is 'right':
+            touch.ud['tympRedline'].points += [touch.x, touch.y]
+        elif self.parent.parent.ids.tympDrawCtrlID.selectedTymp is 'left':
+            touch.ud['tympBlueline'].points += [touch.x, touch.y]
+
+    def clearLine(self):
+        if self.parent.parent.ids.tympDrawCtrlID.selectedTymp is 'right':
+            # App.get_running_app().linesDictList.append(touch.ud)
+            App.get_running_app().linesDictList = self.searchAndDestroy('tympRedline',
+                                                                        App.get_running_app().linesDictList)
+            # touch.ud['tympRedline'].points = []
+        elif self.parent.parent.ids.tympDrawCtrlID.selectedTymp is 'left':
+            App.get_running_app().linesDictList = self.searchAndDestroy('tympBlueline',
+                                                                        App.get_running_app().linesDictList)
+            # touch.ud['tympBlueline'].points = []
+
+    def searchAndDestroy(self, akey, alist):
+        for dict_element in alist:
+            if akey in dict_element:
+                dict_element[akey].points = []
+        return alist
+
 
 
 class TympDrawCtrl(Widget):
+    tympDrawCtrlID = ObjectProperty()
+    selectedTymp = StringProperty('')
+
+
     pass
 
 
