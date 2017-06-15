@@ -12,6 +12,7 @@ TO DO:
 
 from itertools import izip as zip
 
+from fpdf import FPDF
 from kivy.app import App
 # from kivy.garden.roulette import Roulette, CyclicRoulette
 from kivy.graphics import Color, Line
@@ -37,8 +38,6 @@ class NavigationBar(ActionBar):
     def goToSpeechScreen(self):
         self.generateAudioChart()
         self.parent.parent.manager.get_screen('speech').speechAudioID.reload()
-        # self.manager.get_screen('audio').currentAudioChart.export_to_png('tmp/audio.png')
-        # self.root.parent.parent.manager.get_screen('audio').currentAudioChart.export_to_png('tmp/audio.png')
         self.parent.parent.manager.current = 'speech'
     pass
 
@@ -90,12 +89,45 @@ class SpeechScreen(Screen):
 
 
 class ImmittanceScreen(Screen):
+    tympImage = ObjectProperty()
+    tympData = ObjectProperty()
+    reflexImage = ObjectProperty()
+
     pass
 
 
 class ReportScreen(Screen):
     def save_audiogram(self):
         self.manager.get_screen('audio').current_audiogram.export_to_png('testpng.png')
+
+    def makeAudiogramReportPDF(self):
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_font('Arial', 'B', 16)
+        pdf.cell(40, 10, 'Audiometry Results')
+
+        # get the patient information and put it into a cell
+        name = self.manager.get_screen('patient').patientInput.patientName
+        dob = self.manager.get_screen('patient').patientInput.patientDOB
+        sex = self.manager.get_screen('patient').patientInput.patientSex
+        filenumber = self.manager.get_screen('patient').patientInput.patientFile
+
+        # get the test information from the audio screen
+        # test_type = self.manager.get_screen('audio').controlle
+
+
+        #  insert the Audiogram Image
+        pdf.image('tmp/audio.png', x=10, y=20, w=130, h=100)
+
+        #  create tmp images
+        self.manager.get_screen('immittance').tympImage.tympDrawID.export_to_png('tmp/tymp.png')
+        self.manager.get_screen('immittance').reflexImage.export_to_png('tmp/reflex.png')
+
+        # insert the other images
+        pdf.image('tmp/tymp.png', x=10, y=150, w=60, h=50)
+        pdf.image('tmp/reflex.png', x=80, y=150, w=60, h=50)
+
+        pdf.output('test.pdf', 'F')
 
     pass
 
@@ -211,13 +243,9 @@ class AudioButton(Button):
 
 
     def on_touch_down(self, touch):
-
-
         if (self.collide_point(*touch.pos) and touch.is_double_tap == False
             and self.parent.parent.parent.parent.parent.parent.parent.ids.drawlineDrawer.collapse == False):
-            #print('my precious you found the parent')
-
-            # with self.parent.parent.parent.parent.parent.parent.parent.parent.canvas:
+            # that is a long parent string isn't it!
             with self.parent.parent.parent.canvas:
                 # logic to change initial colour and line
                 if App.get_running_app().lineType == 'right':
@@ -226,27 +254,17 @@ class AudioButton(Button):
                 elif App.get_running_app().lineType == 'left':
                     Color(0, 0, 1, 1)
                     touch.ud['blueline'] = Line(points=(self.center_x, self.center_y), dash_offset=5)
-                # adds the
+                # adds the touch to the line Dict List
                 App.get_running_app().linesDictList.append(touch.ud)
-                print 'touch.ud'
-                print touch.ud
-            # so now I want to reference a draw method in the audiogramW canvas I think?
-            # I want it to take thes touck inputs and then take the next collide on drag for a button containing either
-            # a r or l AC symbol, and draw a line between them
 
         elif self.collide_point(*touch.pos) and not touch.is_double_tap:
             super(AudioButton, self).on_touch_down(touch)
             # print self.text  # references the level,
             # print self.parent.parent.frequencyLabel  #
-
-            # print self.parent.parent.parent.parent.parent.parent.parent.parent.ids  # this is it
-
-
-
-            print self.parent.parent.parent.parent.ids
-
-            print '-' * 10
-            print self.parent.parent.parent.parent.ids['audiogramW'].ids
+            # print self.parent.parent.parent.parent.ids
+            #
+            # print '-' * 10
+            # print self.parent.parent.parent.parent.ids['audiogramW'].ids
 
         #     double tap
         if self.collide_point(*touch.pos) and touch.is_double_tap:

@@ -1515,6 +1515,9 @@ ScreenManager:
 
 
 <ImmittanceScreen>:
+    tympImage:tympImage
+    #tympData:tympData
+    reflexImage:reflexImage
     BoxLayout:
         orientation:'vertical'
 
@@ -1530,113 +1533,113 @@ ScreenManager:
                 text:'Acoustic Reflexes'
                 size_hint:(1.0,0.1)
             TympInput:
+                id:tympImage
                 size_hint_x:0.8
-                tympInput:tympInput
-                id:tympInput
+                #tympInput:tympInput
+                #id:tympInput
             BoxLayout:
                 orientation:'vertical'
                 size_hint:(1.0,1.0)
-#                Label:
-#                    text:'Contra-lateral'
-#                    size_hint: (1., 0.1)
-                GridLayout:
-                    cols:3
-                    Label:
-                        color:[0,0,0,1]
-                        text:'Sound Right'
-                        size_hint: (1., 0.15)
-                        canvas.before:
-                            Color:
-                                rgba: 1, 1, 1,1# your color here
-                            Rectangle:
-                                pos: self.pos
-                                size: self.size
-                    Label:
-                        size_hint: (1., 0.15)
-                        color:[0,0,0,1]
-                        text:'Contra-lateral'
-                        canvas.before:
-                            Color:
-                                rgb: 1, 1, 1 # your color here
-                            Rectangle:
-                                pos: self.pos
-                                size: self.size
-                    Label:
-                        text:'Sound Left'
-                        color:[0,0,0,1]
-                        size_hint: (1., 0.15)
-                        canvas.before:
-                            Color:
-                                rgba: 1, 1, 1,1 # your color here
-                            Rectangle:
-                                pos: self.pos
-                                size: self.size
-                    ReflexInputR:
-                    Label:
-                        size_hint: (1., 0.1)
-                        canvas.before:
-                            Rectangle:
-                                size:self.size
+                BoxLayout:
+                    id:reflexImage
+                    orientation:'vertical'
+                    size_hint:(1.0,0.8)
+                    GridLayout:
+                        cols:3
+                        Label:
+                            color:[0,0,0,1]
+                            text:'Sound Right'
+                            size_hint: (1., 0.15)
+                            canvas.before:
+                                Color:
+                                    rgba: 1, 1, 1,1# your color here
+                                Rectangle:
+                                    pos: self.pos
+                                    size: self.size
+                        Label:
+                            size_hint: (1., 0.15)
+                            color:[0,0,0,1]
+                            text:'Contra-lateral'
+                            canvas.before:
+                                Color:
+                                    rgb: 1, 1, 1 # your color here
+                                Rectangle:
+                                    pos: self.pos
+                                    size: self.size
+                        Label:
+                            text:'Sound Left'
+                            color:[0,0,0,1]
+                            size_hint: (1., 0.15)
+                            canvas.before:
+                                Color:
+                                    rgba: 1, 1, 1,1 # your color here
+                                Rectangle:
+                                    pos: self.pos
+                                    size: self.size
+                        ReflexInputR:
+                        Label:
+                            size_hint: (1., 0.1)
+                            canvas.before:
+                                Rectangle:
+                                    size:self.size
 
-                                pos:self.pos
-                                source:'Images/reflexes/Contra.png'
-                    ReflexInputL:
-#                Label:
-#                    text:'Ipsi-lateral'
-#                    size_hint: (1., 0.1)
-                GridLayout:
-                    cols:3
-                    Label:
-                        text:''
-                        size_hint: (1., 0.15)
-                        canvas.before:
-                            Color:
-                                rgba: 1, 1, 1,1 # your color here
-                            Rectangle:
-                                pos: self.pos
-                                size: self.size
-                    Label:
-                        size_hint: (1., 0.15)
-                        color:[0,0,0,1]
-                        text:'Ipsi-lateral'
+                                    pos:self.pos
+                                    source:'Images/reflexes/Contra.png'
+                        ReflexInputL:
 
-                        canvas.before:
-                            Color:
-                                rgb: 1, 1, 1 # your color here
-                            Rectangle:
-                                pos: self.pos
-                                size: self.size
-                    Label:
-                        text:''
-                        size_hint: (1., 0.15)
-                        canvas.before:
-                            Color:
-                                rgba: 1, 1, 1,1 # your color here
-                            Rectangle:
-                                pos: self.pos
-                                size: self.size
-                    ReflexInputR:
+                    GridLayout:
+                        cols:3
+                        Label:
+                            text:''
+                            size_hint: (1., 0.15)
+                            canvas.before:
+                                Color:
+                                    rgba: 1, 1, 1,1 # your color here
+                                Rectangle:
+                                    pos: self.pos
+                                    size: self.size
+                        Label:
+                            size_hint: (1., 0.15)
+                            color:[0,0,0,1]
+                            text:'Ipsi-lateral'
 
-                    Label:
-                        size_hint: (1., 0.1)
-                        canvas.before:
-                            Rectangle:
-                                size:self.size
-                                pos:self.pos
-                                source:'Images/reflexes/Ipsi.png'
-                    ReflexInputL:
-                Label:
-                    size_hint:(1., 0.2)
-                    canvas.before:
-                        Rectangle:
-                            size:self.size
-                            pos:self.pos
-                            source:'Images/reflexes/reflexKey.png'
+                            canvas.before:
+                                Color:
+                                    rgb: 1, 1, 1 # your color here
+                                Rectangle:
+                                    pos: self.pos
+                                    size: self.size
+                        Label:
+                            text:''
+                            size_hint: (1., 0.15)
+                            canvas.before:
+                                Color:
+                                    rgba: 1, 1, 1,1 # your color here
+                                Rectangle:
+                                    pos: self.pos
+                                    size: self.size
+                        ReflexInputR:
+
+                        Label:
+                            size_hint: (1., 0.1)
+                            canvas.before:
+                                Rectangle:
+                                    size:self.size
+                                    pos:self.pos
+                                    source:'Images/reflexes/Ipsi.png'
+                        ReflexInputL:
+                    Image:
+                        source:'Images/reflexes/reflexKey.png'
+                        size_hint:(1., 0.2)
+                        keep_ratio:False
+                        allow_stretch:True
 
 
                 TextInput:
+                    size_hint:(1.0,0.2)
                     text:'Acoustic Reflex Comments:'
                 TextInput:
+                    size_hint:(1.0,0.2)
                     text:'Otoscopy Comments:'
 
 
@@ -1651,4 +1654,9 @@ ScreenManager:
             id:print_audiogram_btn
             text:'Save Audiogram as PNG'
             on_press:root.save_audiogram()
+
+        Button:
+            id:makePDF
+            text:'PDF Report'
+            on_press:root.makeAudiogramReportPDF()
 
