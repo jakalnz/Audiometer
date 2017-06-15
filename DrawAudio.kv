@@ -765,6 +765,9 @@
     controlID:controlID
     controllerNR:controllerNR
     controllerNote:controllerNote
+    transducer:transducer
+    reliability:reliability
+    test_type:test_type
     id:controlID
     BoxLayout:
         size:root.size
@@ -934,6 +937,14 @@
             size_hint_y:.2
             text:'Good'
             values:['Good','Fair', 'Poor']
+        Label:
+            text:'Test Type'
+            size_hint_y:.1
+        Spinner:
+            id:test_type
+            size_hint_y:.2
+            text:'PTA'
+            values:['PTA','CPA', 'VRA']
 
 <SpeechInput>:
     id:'default'
@@ -1402,6 +1413,7 @@ ScreenManager:
     drawlineDrawer:drawlineDrawer
     patientLabel:patientLabel
     currentAudioChart:currentAudioChart
+    control:control
 
     BoxLayout:
         id:current_audiogram
@@ -1459,7 +1471,8 @@ ScreenManager:
                             on_press: root.clearBlueLine() # method that clears the blue lines
                 AccordionItem:
                     title:'Draw Symbols'
-                    Controller
+                    Controller:
+                        id:control
         GridLayout:
             size_hint_y:.1
             pos:root.pos
@@ -1527,11 +1540,11 @@ ScreenManager:
             cols:2
             spacing:30
             Label:
-                text:'Tympanometry'
-                size_hint:(0.8,0.1)
+                text:'\nTympanometry'
+                size_hint:(0.8,0.02)
             Label:
-                text:'Acoustic Reflexes'
-                size_hint:(1.0,0.1)
+                text:'\nAcoustic Reflexes'
+                size_hint:(1.0,0.02)
             TympInput:
                 id:tympImage
                 size_hint_x:0.8
@@ -1543,7 +1556,7 @@ ScreenManager:
                 BoxLayout:
                     id:reflexImage
                     orientation:'vertical'
-                    size_hint:(1.0,0.8)
+                    size_hint:(1.0,0.36)
                     GridLayout:
                         cols:3
                         Label:
@@ -1634,6 +1647,14 @@ ScreenManager:
                         keep_ratio:False
                         allow_stretch:True
 
+                Label:
+                    size_hint:(1.0,0.02)
+                    canvas.before:
+                        Color:
+                            rgba: 0, 0, 0,1 # your color here
+                        Rectangle:
+                            size:self.size
+                            pos:self.pos
 
                 TextInput:
                     size_hint:(1.0,0.2)

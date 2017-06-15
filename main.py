@@ -7,6 +7,7 @@ TO DO:
     3b. for ART input have popup widget with roulette (default 90 +5), select present or noreponse or cancel passes info to
         a custom widget textinput and small label which shows elevated symbol or just type NR which is easier
     4. Report
+    5. Geolocation https://github.com/geopy/geopy
     '''
 
 
@@ -56,7 +57,7 @@ class AudioScreen(Screen):
     currentAudioChart = ObjectProperty()
     drawlineDrawer = ObjectProperty()
     patientLabel = ObjectProperty()
-
+    control = ObjectProperty()
     # patientLabel.text = App.get_running_app().patientdetails
     # patientLabelText = StringProperty()
 
@@ -112,9 +113,16 @@ class ReportScreen(Screen):
         sex = self.manager.get_screen('patient').patientInput.patientSex
         filenumber = self.manager.get_screen('patient').patientInput.patientFile
 
-        # get the test information from the audio screen
-        # test_type = self.manager.get_screen('audio').controlle
+        pdf.cell(40, 10, name[0] + ' ' + name[1])
+        pdf.cell(40, 10, dob[0] + dob[1] + dob[2] + ' ' + sex + 'File: ' + filenumber)
 
+        # get the test information from the audio screen
+        transducer = self.manager.get_screen('audio').control.transducer.text
+        reliability = self.manager.get_screen('audio').control.reliability.text
+        test_type = self.manager.get_screen('audio').control.test_type.text
+        print transducer
+        print reliability
+        print test_type
 
         #  insert the Audiogram Image
         pdf.image('tmp/audio.png', x=10, y=20, w=130, h=100)
@@ -362,12 +370,6 @@ class SpeechInput(Widget):
     speechInputID = ObjectProperty(None)
 
 
-    # Material[Spondee, CVC, HINT, MLV], Score
-    # Type[SDT, SRT, PRT, WRT, MCL, UCL], ?SNR, also
-    #comments
-
-
-
 class TympInput(Widget):
     tympInputID = ObjectProperty(None)
     tympDrawID = ObjectProperty(None)
@@ -478,6 +480,10 @@ class Controller(Widget):
     controlID = ObjectProperty(None)
     controllerNR = ObjectProperty(None)
     controllerNote = ObjectProperty(None)
+    transducer = ObjectProperty(None)
+    reliability = ObjectProperty()
+    test_type = ObjectProperty()
+
     mipmap = True
 
     def getControllerInput(self, symbol):
