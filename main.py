@@ -8,6 +8,7 @@ TO DO:
         a custom widget textinput and small label which shows elevated symbol or just type NR which is easier
     4. Report
     5. Geolocation https://github.com/geopy/geopy
+    6. SF and Aided, maybe add a float layou into the button with a second clear canvas to whic i can add the new icons
     '''
 
 
@@ -48,7 +49,6 @@ class NavigationBar(ActionBar):
 
 class PatientScreen(Screen):
     patientInput = ObjectProperty()
-
     pass
 
 
@@ -58,11 +58,6 @@ class AudioScreen(Screen):
     drawlineDrawer = ObjectProperty()
     patientLabel = ObjectProperty()
     control = ObjectProperty()
-    # patientLabel.text = App.get_running_app().patientdetails
-    # patientLabelText = StringProperty()
-
-
-
 
     def searchAndDestroy(self, akey, alist):
         for dict_element in alist:
@@ -93,7 +88,6 @@ class ImmittanceScreen(Screen):
     tympImage = ObjectProperty()
     tympData = ObjectProperty()
     reflexImage = ObjectProperty()
-
     pass
 
 
@@ -136,8 +130,29 @@ class ReportScreen(Screen):
         pdf.image('tmp/reflex.png', x=80, y=150, w=60, h=50)
 
         pdf.output('test.pdf', 'F')
-
     pass
+
+
+def reCodeStringToButtonSF(currentSymbol):
+    index = 'SF'
+    value = [0, 0]
+
+    if currentSymbol[0] == 'sf':
+        index = 'SF'
+        if currentSymbol[1] == '--':
+            value = [1, currentSymbol[2]]  # [threshold, note]
+        elif currentSymbol[1] == 'nr':
+            value = [3, currentSymbol[2]]  # [no response, note]
+    elif currentSymbol[3] == 'ha':
+        index = 'HA'
+        if currentSymbol[4] == '--':
+            value = [1, currentSymbol[5]]  # [threshold, note]
+        elif currentSymbol[1] == 'nr':
+            value = [3, currentSymbol[5]]  # [no response, note]
+
+    output = [index, value]
+    return output
+
 
 
 def reCodeStringToButton(currentSymbol):
@@ -174,7 +189,6 @@ def reCodeStringToButton(currentSymbol):
             value = [4, currentSymbol[7]]
 
     output = [index, value]
-
     return output
 
 
@@ -204,6 +218,24 @@ def ButtonDictToString(value):
     return [RBCcode, ACcode, LBCcode]
 
 
+def ButtonSFDictToString(value):
+    #  reads input (ButtonDict) and returns a list of strings in the format:[SFHAcode]
+    string_dict = {}
+
+    start_key = {'SF': 'sf', 'HA': 'ha'}
+    symbol_key = {0: '--', 1: '--', 3: 'nr'}  # no masking for SF
+
+    for key in value:
+        # determine if value is 0 and then put '--' in string
+        if value[key][0] == 0:
+            string_dict[key] = '--' + symbol_key[value[key][0]]
+        else:
+            string_dict[key] = start_key[key] + symbol_key[value[key][0]]
+
+    SFHAcode = string_dict['SF'] + str(value['SF'][1]) + string_dict['HA'] + str(value['HA'][1])
+
+    return SFHAcode
+
 # buttons create
 class AudioButton(Button):
     level = NumericProperty(0)
@@ -211,48 +243,66 @@ class AudioButton(Button):
     airconduction = ObjectProperty(None)
     rightboneconduction = ObjectProperty(None)
     leftboneconduction = ObjectProperty(None)
+    sflayout = ObjectProperty(None)
     mipmap = True
 
     # dictionary that stores contents, numeric values = [0-empty, 1-threshold, 2-maskedthreshold 3-threshnoresp, 4maskenoresp],[ 0-no note,1-note1, 2-note2, 3-note3]]
     contents = DictProperty({'LAC': [0, 0], 'RAC': [0, 0], 'LBC': [0, 0], 'RBC': [0, 0]})
+    sfcontents = DictProperty({'SF': [0, 0], 'HA': [0, 0]})
 
     # create a method that on click reports position of button, gives level, gets frequencycolumn label
     def changeImage(self):
-        currentSymbol = App.get_running_app().controllerOutput
+
+        if App.get_running_app().symbolType is 'nonSF':
+            currentSymbol = App.get_running_app().controllerOutput
+        else:
+            currentSymbol = App.get_running_app().controllerSFOutput
         print currentSymbol
 
+        if App.get_running_app().symbolType is 'nonSF':
+            # adds the symbol to the Button dictProperty "contents"
+            new_content_list = reCodeStringToButton(currentSymbol)
+            print 'this is the content list: '
+            print new_content_list
+            self.contents[new_content_list[0]] = new_content_list[1]
 
-        # adds the symbol to the Button dictProperty "contents"
-        # print reCodeStringToButton(currentSymbol)
-        new_content_list = reCodeStringToButton(currentSymbol)
-        print 'this is the content list: '
-        print new_content_list
-        self.contents[new_content_list[0]] = new_content_list[1]
+            # decode contents
+            symbolList = ButtonDictToString(self.contents)
+            print 'this is the symbolList: '
+            print symbolList
 
-        # decode contents
-        symbolList = ButtonDictToString(self.contents)
-        print 'this is the symbolList: '
-        print symbolList
+            self.airconduction.source = 'Images/' + symbolList[1] + '.png'
 
-        self.airconduction.source = 'Images/' + symbolList[1] + '.png'
+            # only do BC for BC frequencies alternatively could have a second method for intermediate freq
+            if self.parent.parent.frequencyLabel in ['125', '250', '500', '1000', '2000', '4000']:
+                self.rightboneconduction.source = 'Images/' + symbolList[0] + '.png'
+                self.leftboneconduction.source = 'Images/' + symbolList[2] + '.png'
 
-        # only do BC for BC frequencies alternatively could have a second method for intermediate freq
-        if self.parent.parent.frequencyLabel in ['125', '250', '500', '1000', '2000', '4000']:
-            self.rightboneconduction.source = 'Images/' + symbolList[0] + '.png'
-            self.leftboneconduction.source = 'Images/' + symbolList[2] + '.png'
+        # for SF inputs...
+        if App.get_running_app().symbolType is 'SF':
+            new_content_list = reCodeStringToButtonSF(currentSymbol)
+            print 'this is the SF content list: '
+            print new_content_list
+            self.sfcontents[new_content_list[0]] = new_content_list[1]
+            symbolList = ButtonSFDictToString(self.sfcontents)
+            print 'this is the symbolList: '
+            print symbolList
+            # self.sflayout.source = 'Images/' + symbolList[1] + '.png'
+            self.sflayout.source = 'Icons/' + 'SF' + '.png'
 
-
+        # report which button was pressed
         print self.text  # references the level,
         print self.parent.parent.frequencyLabel  # references the frequency
-
 
         return
 
 
 
     def on_touch_down(self, touch):
-        if (self.collide_point(*touch.pos) and touch.is_double_tap == False
-            and self.parent.parent.parent.parent.parent.parent.parent.ids.drawlineDrawer.collapse == False):
+
+        # are we drawing lines?
+        if (self.collide_point(*touch.pos) and touch.is_double_tap is False
+            and self.parent.parent.parent.parent.parent.parent.parent.ids.drawlineDrawer.collapse is False):
             # that is a long parent string isn't it!
             with self.parent.parent.parent.canvas:
                 # logic to change initial colour and line
@@ -265,16 +315,11 @@ class AudioButton(Button):
                 # adds the touch to the line Dict List
                 App.get_running_app().linesDictList.append(touch.ud)
 
+        # are we placing symbols?
         elif self.collide_point(*touch.pos) and not touch.is_double_tap:
             super(AudioButton, self).on_touch_down(touch)
-            # print self.text  # references the level,
-            # print self.parent.parent.frequencyLabel  #
-            # print self.parent.parent.parent.parent.ids
-            #
-            # print '-' * 10
-            # print self.parent.parent.parent.parent.ids['audiogramW'].ids
 
-        #     double tap
+        # are we doing a double tap
         if self.collide_point(*touch.pos) and touch.is_double_tap:
             currentSymbol = App.get_running_app().controllerOutput
             print currentSymbol
@@ -293,7 +338,7 @@ class AudioButton(Button):
         return
 
     def on_touch_move(self, touch):
-        if (self.parent.parent.parent.parent.parent.parent.parent.ids.drawlineDrawer.collapse == False
+        if (self.parent.parent.parent.parent.parent.parent.parent.ids.drawlineDrawer.collapse is False
             and self.collide_point(*touch.pos)):
 
             # add logic to change line colour if NR to clear
@@ -487,9 +532,14 @@ class Controller(Widget):
     mipmap = True
 
     def getControllerInput(self, symbol):
-        # reinit the list on button press - but keep notes and NR
+        # reinit the list on button press - but keep notes
         App.get_running_app().controllerOutput[0:3] = ['--', '-', '--']
         App.get_running_app().controllerOutput[4:7] = ['--', '-', '--']
+        # create a seperate list for SF thresholds
+        App.get_running_app().controllerSFOutput[0:2] = ['--', '--']
+        App.get_running_app().controllerSFOutput[3:5] = ['--', '--']
+        # default symbolType to non-SF
+        App.get_running_app().symbolType = 'nonSF'
         # assign values to list
         if symbol == 'ra-':
             App.get_running_app().controllerOutput[0] = 'ra'
@@ -515,16 +565,20 @@ class Controller(Widget):
         elif symbol == 'lbm':
             App.get_running_app().controllerOutput[4] = 'lb'
             App.get_running_app().controllerOutput[5] = 'm'
+        elif symbol == 'sf-':
+            App.get_running_app().controllerSFOutput[0] = 'sf'
+            App.get_running_app().symbolType = 'SF'
+        elif symbol == 'ha-':
+            App.get_running_app().controllerSFOutput[3] = 'ha'
+            App.get_running_app().symbolType = 'SF'
 
-        # self.ids.nr.getControllerNR(self.ids.nr.getControllerNR.state)
         # reset notes and NR widgets on new item select
         self.ids.controllerNR.state = 'normal'
         self.ids.controllerNote.text = 'No Note'
-        # App.get_running_app().symbolType = symbol
-        # print(App.get_running_app().symbolType)
-        print(App.get_running_app().controllerOutput)
 
-        # will need to change this so I'm inputting to a list property at a certain position but yay!
+        print(App.get_running_app().controllerOutput)
+        print(App.get_running_app().controllerSFOutput)
+
 
     def getControllerNote(self, note):
 
@@ -532,6 +586,9 @@ class Controller(Widget):
         App.get_running_app().controllerOutput[3] = '0'
         App.get_running_app().controllerOutput[7] = '0'
 
+        App.get_running_app().controllerSFOutput[2] = '0'
+        App.get_running_app().controllerSFOutput[5] = '0'
+        if App.get_running_app().controllerOutput[0] != '--' or App.get_running_app().controllerOutput[4] != '--':
         # set pos of list to be relapced based on l or r input
         if App.get_running_app().controllerOutput[0] != '--':
             pos = 3
@@ -552,6 +609,26 @@ class Controller(Widget):
             print 'Note1'
 
         print App.get_running_app().controllerOutput
+        print App.get_running_app().controllerSFOutput
+
+        # for SF
+        if App.get_running_app().controllerSFOutput[0] != '--' or App.get_running_app().controllerSFOutput[3] != '--':
+            if App.get_running_app().controllerSFOutput[0] != '--':
+                pos = 2
+            else:
+                pos = 5
+            if note == 'No Note':
+                App.get_running_app().controllerSFOutput[pos] = '0'
+                print 'Note0'
+            elif note == 'Note 1':
+                App.get_running_app().controllerSFOutput[pos] = '1'
+                print 'Note1'
+            elif note == 'Note 2':
+                App.get_running_app().controllerSFOutput[pos] = '2'
+                print 'Note2'
+            elif note == 'Note 3':
+                App.get_running_app().controllerSFOutput[pos] = '3'
+                print 'Note1'
 
     def getControllerNR(self, state):
         # Note NR state resets when the getControllerInput method is called
@@ -559,6 +636,10 @@ class Controller(Widget):
         if state == 'normal':
             App.get_running_app().controllerOutput[2] = '--'
             App.get_running_app().controllerOutput[6] = '--'
+
+            App.get_running_app().controllerSFOutput[1] = '--'
+            App.get_running_app().controllerSFOutput[4] = '--'
+
         if state == 'down':
             no_response_text = 'nr'
 
@@ -569,18 +650,19 @@ class Controller(Widget):
             App.get_running_app().controllerOutput[6] = no_response_text
             App.get_running_app().controllerOutput[2] = '--'
 
-            # print App.get_running_app().controllerOutput
-
-            #print(state)
-
-        # get input from widgets and pass to the audiogram button widgets
-
-
+        if App.get_running_app().controllerSFOutput[0] != '--':
+            App.get_running_app().controllerSFOutput[1] = no_response_text
+            App.get_running_app().controllerSFOutput[4] = '--'
+        if App.get_running_app().controllerSFOutput[3] != '--':
+            App.get_running_app().controllerSFOutput[4] = no_response_text
+            App.get_running_app().controllerSFOutput[1] = '--'
 
 
 class DrawAudioApp(App):
     symbolType = StringProperty()
     controllerOutput = ListProperty(['--', '-', '--', '0', '--', '-', '--', '0'])
+    controllerSFOutput = ListProperty(
+        ['--', '--', '-', '--', '--', '-'])  # list def: ['sf', 'nr', '0', 'ha', 'nr', '0']
     lineType = StringProperty()
     clearRed = ObjectProperty()
     clearBlue = ObjectProperty()

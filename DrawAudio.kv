@@ -8,29 +8,15 @@
 <AudioButton>
     id:default
     airconduction:airconduction
-
-
-
+    sflayout:sflayout
     background_normal: ('')
-    #background_color: (1, 1, 1, 1) #a nice white background that hides my image
     background_color: (0, 0, 0, 0) #a nice white background that hides my image
     text:"one"
     color:0,0,0,0 #made opacity 0 so cant interfere with grid lines may look to doing button behaviour
 
     size_hint:(1,1)
     on_press: self.changeImage() #WORKS!
-    #on_touch_up: print str(self.text) +' * '+ str(self.parent.parent.frequencyLabel) + ' was lifted'
 
-#    canvas:
-##
-#        Color:
-#            rgba:(0,1,1,0)
-#        Rectangle:
-##
-#            pos: (self.center_x-self.height/2,self.center_y-self.height/2)
-#
-#            size:self.height,self.height
-#            #texture:self.ctex
 
     Image:
 
@@ -41,6 +27,14 @@
         size:1.5*self.parent.height,1.5*self.parent.height
         #texture: makeTexture('RAC.png', 'LAC.png')
         mipmap: root.mipmap
+
+    Image:
+        id:sflayout
+        x: self.parent.center_x-1.5*self.parent.height/2
+        y: self.parent.center_y-1.5*self.parent.height/2
+        size:1.5*self.parent.height,1.5*self.parent.height
+        mipmap: root.mipmap
+        source:'Icons/Empty.png'
 
 <OctaveAudioButton@AudioButton>
     rightboneconduction:rightboneconduction
@@ -60,6 +54,10 @@
         y:self.parent.center_y-1.5*self.parent.height/2
         size:1.5*self.parent.height,1.5*self.parent.height
         mipmap: root.mipmap
+
+
+
+
 
 
 
@@ -780,6 +778,31 @@
         GridLayout:
 
             cols:3
+            Label:
+                text:'SF'
+            Label:
+            Label:
+                text:'Aided'
+            ToggleButton:
+                id:sf-
+                group:type
+                canvas.after:
+                    Rectangle:
+                        size:self.size
+                        pos:self.pos
+                        source:'Icons/SF.png'
+                on_press:root.getControllerInput('sf-')
+            Label:
+            ToggleButton:
+                id:ad-
+                group:type
+                canvas.after:
+                    Rectangle:
+                        size:self.size
+                        pos:self.pos
+                        source:'Icons/Aided.png'
+                on_press:root.getControllerInput('ha-')
+
 
             Label:
                 text:'Right'
