@@ -765,6 +765,9 @@
     controlID:controlID
     controllerNR:controllerNR
     controllerNote:controllerNote
+    transducer:transducer
+    reliability:reliability
+    test_type:test_type
     id:controlID
     BoxLayout:
         size:root.size
@@ -934,49 +937,416 @@
             size_hint_y:.2
             text:'Good'
             values:['Good','Fair', 'Poor']
+        Label:
+            text:'Test Type'
+            size_hint_y:.1
+        Spinner:
+            id:test_type
+            size_hint_y:.2
+            text:'PTA'
+            values:['PTA','CPA', 'VRA']
 
 <SpeechInput>:
     id:'default'
 
-    BoxLayout
-
+    BoxLayout:
         size:root.size
         pos:root.pos
         GridLayout:
-            cols:3
+            cols:6
 
-
+            Label:
+                text:'Material'
+            Label:
+                text:'Type'
             Label:
                 text:'Level \n(dBHL)'
             Label:
                 text:'Score\n(%)'
             Label:
+                text:'SNR'
+            Label:
                 text:'Masked'
+            Spinner:
+                text:'CVC'
+                values:['CVC','MLV','Spondee', 'HINT']
+            Spinner:
+                text:'SRT'
+                values:['SDT', 'SRT', 'WRT', 'MCL', 'UCL']
             TextInput:
                 id:speech_level_1
             TextInput:
                 id:speech_score_1
+            TextInput:
+                id:SNR
             CheckBox:
                 id:masked_speech_1
+            Spinner:
+                text:'CVC'
+                values:['CVC','MLV','Spondee', 'HINT']
+            Spinner:
+                text:'SRT'
+                values:['SDT', 'SRT', 'WRT', 'MCL', 'UCL']
             TextInput:
                 id:speech_level_2
             TextInput:
                 id:speech_score_2
+            TextInput:
+                id:SNR
             CheckBox:
                 id:masked_speech_2
+            Spinner:
+                text:'CVC'
+                values:['CVC','MLV','Spondee', 'HINT']
+            Spinner:
+                text:'SRT'
+                values:['SDT', 'SRT', 'WRT', 'MCL', 'UCL']
             TextInput:
                 id:speech_level_3
             TextInput:
                 id:speech_score_3
+            TextInput:
+                id:SNR
             CheckBox:
                 id:masked_speech_3
+            Spinner:
+                text:'CVC'
+                values:['CVC','MLV','Spondee', 'HINT']
+            Spinner:
+                text:'SRT'
+                values:['SDT', 'SRT', 'WRT', 'MCL', 'UCL']
             TextInput:
                 id:speech_level_4
             TextInput:
                 id:speech_score_4
+            TextInput:
+                id:SNR
             CheckBox:
                 id:masked_speech_4
 
+<TympDrawCtrl>:
+
+    BoxLayout:
+        size:root.size
+        pos:root.pos
+        ToggleButton:
+            text:'Draw Right'
+            group:'l-r-sel'
+            on_press:root.selectedTymp ='right'
+        ToggleButton:
+            text:'Draw Left'
+            group:'l-r-sel'
+            on_press:root.selectedTymp = 'left'
+        Button:
+            text:'Clear Selected'
+            on_press:root.parent.parent.ids.tympDrawID.clearLine()
+
+<TympDraw>:
+    id:default
+
+    canvas.before:
+        Rectangle:
+            size:self.size
+            pos:self.pos
+            source:'Images/reflexes/TympCanvas.png'
+
+<TympInput>:
+
+    tympInputID: tympInputID
+    tympDrawCtrlID:tympDrawCtrlID
+    tympDrawID:tympDrawID
+    id:tympInputID
+    BoxLayout:
+        size:root.size
+        pos:root.pos
+        orientation:'vertical'
+        TympDraw:
+            id:tympDrawID
+        TympDrawCtrl:
+            id:tympDrawCtrlID
+            size_hint:(1,0.1)
+        GridLayout:
+            cols:3
+            row_default_height:30
+            Label:
+                text:'Right'
+
+            Label:
+                text:''
+            Label:
+                text:'Left'
+            BoxLayout:
+                size:root.size
+                pos:root.pos
+                Spinner:
+                    id:r-type
+                    text:'DNT'
+                    values:'A','B','C','CNT','DNT'
+                Spinner:
+                    id:r-mod
+                    text:''
+                    values:'','deep','shallow','high','low'
+            Label:
+                text:'Type'
+            BoxLayout:
+                size:root.size
+                pos:root.pos
+                Spinner:
+                    id:l-type
+                    text:'DNT'
+                    values:'A','B','C','CNT','DNT'
+                Spinner:
+                    id:l-mod
+                    text:''
+                    values:'','deep','shallow','high','low'
+            TextInput:
+                id:r-MEP
+            Label:
+                text:'MEP\ndaPa'
+            TextInput:
+                id:l-MEP
+            TextInput:
+                id:r-Adm
+            Label:
+                text:'Com.\nml'
+            TextInput:
+                id:l-Adm
+            TextInput:
+                id:r-Vol
+            Label:
+                text:'Vol\nml'
+            TextInput:
+                id:l-Vol
+            TextInput:
+                id:r-Width
+            Label:
+                text:'Width\ndaPa'
+            TextInput:
+                id:l-Width
+
+
+
+<ReflexType>:
+    #dropDownID:dropDownID
+    Button:
+        id:present
+        text:'present'
+        size_hint_y:None
+        height: '48dp'
+        on_release: root.select('Images/reflexes/Present.png')
+        canvas.after:
+            Rectangle:
+                source:'Images/reflexes/Present_x.png'
+                size:self.size
+                pos:self.pos
+    Button:
+        id:elevated
+        text:'elevated'
+        size_hint_y:None
+        height: '48dp'
+        on_release: root.select('Images/reflexes/Elevated.png')
+        canvas.after:
+            Rectangle:
+                source:'Images/reflexes/Elevated_x.png'
+                size:self.size
+                pos:self.pos
+    Button:
+        id:absent
+        text:'absent'
+        size_hint_y:None
+        height: '48dp'
+        on_release: root.select('Images/reflexes/Absent.png')
+        canvas.after:
+            Rectangle:
+                source:'Images/reflexes/Absent_x.png'
+                size:self.size
+                pos:self.pos
+    Button:
+        id:abnormal
+        text:'abnormal'
+        size_hint_y:None
+        height: '48dp'
+        on_release: root.select('Images/reflexes/Abnormal.png')
+        canvas.after:
+            Rectangle:
+                source:'Images/reflexes/Abnormal_x.png'
+                size:self.size
+                pos:self.pos
+    Button:
+        id:CNT
+        text:'CNT'
+        size_hint_y:None
+        height: '48dp'
+        on_release: root.select('Images/reflexes/CNT.png')
+        canvas.after:
+            Rectangle:
+                source:'Images/reflexes/CNT_x.png'
+                size:self.size
+                pos:self.pos
+    Button:
+        id:DNT
+        text:'DNT'
+        size_hint_y:None
+        height: '48dp'
+        on_release: root.select('Images/reflexes/DNT.png')
+        canvas.after:
+            Rectangle:
+                source:'Images/reflexes/DNT_x.png'
+                size:self.size
+                pos:self.pos
+    Button:
+        id:Blank
+        text:'Blank'
+        size_hint_y:None
+        height: '48dp'
+        on_release: root.select('Images/reflexes/Blank.png')
+        canvas.after:
+            Rectangle:
+                source:'Images/reflexes/Blank_x.png'
+                size:self.size
+                pos:self.pos
+
+
+<ReflexInputR>:
+    id:default
+
+    BoxLayout:
+        orientation:'vertical'
+        size:root.size
+        pos:root.pos
+        GridLayout:
+            cols:3
+            #row_default_height:20
+            Label:
+                text:'0.5kHz'
+                color:[0,0,0,1]
+                canvas.before:
+                    Color:
+                        rgba: 1, 1, 1, 1 # your color here
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+
+            TextInput:
+                height:self.minimum_height
+                multiline:False
+                write_tab: False
+                font_size:11
+
+            ReBut:
+            Label:
+                text:'1kHz'
+                color:[0,0,0,1]
+                canvas.before:
+                    Color:
+                        rgba: 1, 1, 1, 1 # your color here
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+            TextInput:
+                multiline:False
+                write_tab: False
+                font_size:11
+
+            ReBut:
+            Label:
+                text:'2kHz'
+                color:[0,0,0,1]
+                canvas.before:
+                    Color:
+                        rgba: 1, 1, 1, 1# your color here
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+            TextInput:
+                multiline:False
+                write_tab: False
+                font_size:11
+
+            ReBut:
+            Label:
+                text:'BBN'
+                color:[0,0,0,1]
+                canvas.before:
+                    Color:
+                        rgba: 1, 1, 1, 1 # your color here
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+            TextInput:
+                multiline:False
+                write_tab: False
+                font_size:11
+            ReBut:
+
+<ReflexInputL>:
+    id:default
+    BoxLayout:
+        orientation:'vertical'
+        size:root.size
+        pos:root.pos
+        GridLayout:
+            cols:3
+            #row_default_height:25
+            ReBut:
+            TextInput:
+                multiline:False
+                write_tab: False
+                font_size:11
+
+            Label:
+                text:'0.5kHz'
+                color:[0,0,0,1]
+                canvas.before:
+                    Color:
+                        rgba: 1, 1, 1, 1  # your color here
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+            ReBut:
+            TextInput:
+                multiline:False
+                write_tab: False
+                font_size:11
+
+            Label:
+                text:'1kHz'
+                color:[0,0,0,1]
+                canvas.before:
+                    Color:
+                        rgba: 1, 1, 1, 1 # your color here
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+            ReBut:
+            TextInput:
+                multiline:False
+                write_tab: False
+                font_size:11
+
+            Label:
+                text:'2kHz'
+                color:[0,0,0,1]
+                canvas.before:
+                    Color:
+                        rgba: 1, 1, 1, 1 # your color here
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+            ReBut:
+            TextInput:
+                multiline:False
+                write_tab: False
+                font_size:11
+            Label:
+                text:'BBN'
+                color:[0,0,0,1]
+                canvas.before:
+                    Color:
+                        rgba: 1, 1, 1, 1# your color here
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
 ScreenManager:
     id:sm
     PatientScreen:
@@ -1010,7 +1380,8 @@ ScreenManager:
             on_press:root.parent.parent.manager.current = 'audio'
         ActionButton:
             text:'Speech'
-            on_press:root.parent.parent.manager.current = 'speech'
+            #on_press:root.parent.parent.manager.current = 'speech'
+            on_press:root.goToSpeechScreen()
         ActionButton:
             text:'Immittance'
             on_press:root.parent.parent.manager.current = 'immittance'
@@ -1041,7 +1412,8 @@ ScreenManager:
     current_audiogram:current_audiogram
     drawlineDrawer:drawlineDrawer
     patientLabel:patientLabel
-
+    currentAudioChart:currentAudioChart
+    control:control
 
     BoxLayout:
         id:current_audiogram
@@ -1063,6 +1435,7 @@ ScreenManager:
             rows:1
 
             AudiogramW:
+                id:currentAudioChart
 
             Accordion:
                 size_hint_x:.25
@@ -1098,7 +1471,8 @@ ScreenManager:
                             on_press: root.clearBlueLine() # method that clears the blue lines
                 AccordionItem:
                     title:'Draw Symbols'
-                    Controller
+                    Controller:
+                        id:control
         GridLayout:
             size_hint_y:.1
             pos:root.pos
@@ -1107,14 +1481,22 @@ ScreenManager:
                 text:"Comments and Notes:"
 
 <SpeechScreen>:
+    speechAudioID:speechAudioID
+    #speechAudioImage:speechAudioImage
     BoxLayout:
         orientation:'vertical'
         NavigationBar:
             size_hint: (1., 0.1)
         GridLayout:
             cols:2
-            Label:
-                text:'Audiogram png here'
+
+            Image:
+                id:speechAudioID
+                #size_hint: 1,1
+                pos: self.parent.parent.pos
+                source: root.speechAudioImage
+                allow_stretch:True
+                keep_ratio:False
             Label:
                 text:'Speech Graph here'
             Label:
@@ -1146,12 +1528,141 @@ ScreenManager:
 
 
 <ImmittanceScreen>:
+    tympImage:tympImage
+    #tympData:tympData
+    reflexImage:reflexImage
     BoxLayout:
         orientation:'vertical'
+
         NavigationBar:
             size_hint: (1., 0.1)
-        Label:
-            text:'Immittance Testing goes here'
+        GridLayout:
+            cols:2
+            spacing:30
+            Label:
+                text:'\nTympanometry'
+                size_hint:(0.8,0.02)
+            Label:
+                text:'\nAcoustic Reflexes'
+                size_hint:(1.0,0.02)
+            TympInput:
+                id:tympImage
+                size_hint_x:0.8
+                #tympInput:tympInput
+                #id:tympInput
+            BoxLayout:
+                orientation:'vertical'
+                size_hint:(1.0,1.0)
+                BoxLayout:
+                    id:reflexImage
+                    orientation:'vertical'
+                    size_hint:(1.0,0.36)
+                    GridLayout:
+                        cols:3
+                        Label:
+                            color:[0,0,0,1]
+                            text:'Sound Right'
+                            size_hint: (1., 0.15)
+                            canvas.before:
+                                Color:
+                                    rgba: 1, 1, 1,1# your color here
+                                Rectangle:
+                                    pos: self.pos
+                                    size: self.size
+                        Label:
+                            size_hint: (1., 0.15)
+                            color:[0,0,0,1]
+                            text:'Contra-lateral'
+                            canvas.before:
+                                Color:
+                                    rgb: 1, 1, 1 # your color here
+                                Rectangle:
+                                    pos: self.pos
+                                    size: self.size
+                        Label:
+                            text:'Sound Left'
+                            color:[0,0,0,1]
+                            size_hint: (1., 0.15)
+                            canvas.before:
+                                Color:
+                                    rgba: 1, 1, 1,1 # your color here
+                                Rectangle:
+                                    pos: self.pos
+                                    size: self.size
+                        ReflexInputR:
+                        Label:
+                            size_hint: (1., 0.1)
+                            canvas.before:
+                                Rectangle:
+                                    size:self.size
+
+                                    pos:self.pos
+                                    source:'Images/reflexes/Contra.png'
+                        ReflexInputL:
+
+                    GridLayout:
+                        cols:3
+                        Label:
+                            text:''
+                            size_hint: (1., 0.15)
+                            canvas.before:
+                                Color:
+                                    rgba: 1, 1, 1,1 # your color here
+                                Rectangle:
+                                    pos: self.pos
+                                    size: self.size
+                        Label:
+                            size_hint: (1., 0.15)
+                            color:[0,0,0,1]
+                            text:'Ipsi-lateral'
+
+                            canvas.before:
+                                Color:
+                                    rgb: 1, 1, 1 # your color here
+                                Rectangle:
+                                    pos: self.pos
+                                    size: self.size
+                        Label:
+                            text:''
+                            size_hint: (1., 0.15)
+                            canvas.before:
+                                Color:
+                                    rgba: 1, 1, 1,1 # your color here
+                                Rectangle:
+                                    pos: self.pos
+                                    size: self.size
+                        ReflexInputR:
+
+                        Label:
+                            size_hint: (1., 0.1)
+                            canvas.before:
+                                Rectangle:
+                                    size:self.size
+                                    pos:self.pos
+                                    source:'Images/reflexes/Ipsi.png'
+                        ReflexInputL:
+                    Image:
+                        source:'Images/reflexes/reflexKey.png'
+                        size_hint:(1., 0.2)
+                        keep_ratio:False
+                        allow_stretch:True
+
+                Label:
+                    size_hint:(1.0,0.02)
+                    canvas.before:
+                        Color:
+                            rgba: 0, 0, 0,1 # your color here
+                        Rectangle:
+                            size:self.size
+                            pos:self.pos
+
+                TextInput:
+                    size_hint:(1.0,0.2)
+                    text:'Acoustic Reflex Comments:'
+                TextInput:
+                    size_hint:(1.0,0.2)
+                    text:'Otoscopy Comments:'
+
 
 <ReportScreen>:
     BoxLayout:
@@ -1164,4 +1675,9 @@ ScreenManager:
             id:print_audiogram_btn
             text:'Save Audiogram as PNG'
             on_press:root.save_audiogram()
+
+        Button:
+            id:makePDF
+            text:'PDF Report'
+            on_press:root.makeAudiogramReportPDF()
 
