@@ -74,6 +74,12 @@ class AudioScreen(Screen):
     def clearBlueLine(self):
         App.get_running_app().linesDictList = self.searchAndDestroy('blueline', App.get_running_app().linesDictList)
 
+    def clearSFLine(self):
+        App.get_running_app().linesDictList = self.searchAndDestroy('sfline', App.get_running_app().linesDictList)
+
+    def clearHALine(self):
+        App.get_running_app().linesDictList = self.searchAndDestroy('haline', App.get_running_app().linesDictList)
+
     pass
 
 
@@ -309,10 +315,17 @@ class AudioButton(Button):
                 # logic to change initial colour and line
                 if App.get_running_app().lineType == 'right':
                     Color(1, 0, 0, 1)
-                    touch.ud['redline'] = Line(points=(self.center_x, self.center_y))
+                    touch.ud['redline'] = Line(points=(self.center_x, self.center_y), width=1.1)
                 elif App.get_running_app().lineType == 'left':
                     Color(0, 0, 1, 1)
-                    touch.ud['blueline'] = Line(points=(self.center_x, self.center_y), dash_offset=5)
+                    touch.ud['blueline'] = Line(points=(self.center_x, self.center_y), dash_offset=5, width=1.1)
+                elif App.get_running_app().lineType == 'sf':
+                    Color(0.2, 0.2, 0.2, 1)
+                    touch.ud['sfline'] = Line(points=(self.center_x, self.center_y), dash_offset=5, width=1.1)
+                elif App.get_running_app().lineType == 'ha':
+                    Color(0.4, 0.4, 0.4, 1)
+                    touch.ud['haline'] = Line(points=(self.center_x, self.center_y), dash_offset=5, width=1.1)
+
                 # adds the touch to the line Dict List
                 App.get_running_app().linesDictList.append(touch.ud)
 
@@ -358,6 +371,14 @@ class AudioButton(Button):
             if App.get_running_app().lineType == 'left':
                 if self.contents['LAC'][0] != 0:
                     touch.ud['blueline'].points += [self.airconduction.center_x, self.center_y]
+
+            if App.get_running_app().lineType == 'sf':
+                if self.sfcontents['SF'][0] != 0:
+                    touch.ud['sfline'].points += [self.sflayout.center_x, self.center_y]
+
+            if App.get_running_app().lineType == 'ha':
+                if self.sfcontents['HA'][0] != 0:
+                    touch.ud['haline'].points += [self.sflayout.center_x, self.center_y]
 
 
 class FrequencyColumn(Widget):

@@ -564,7 +564,6 @@
 	    LevelColumn:
 	        size_hint_x:0.4
 
-
         FrequencyColumn:
             id:c250
             frequencyLabel: "250"
@@ -610,8 +609,6 @@
         size:root.width, root.height/2
         pos:root.pos
         orientation:'vertical'
-
-
 
 
         GridLayout:
@@ -1479,22 +1476,39 @@ ScreenManager:
                             group:'draw'
                             on_press:root.getLineType('right')
                             text:'red line'
-
                         ToggleButton
                             id:blueline
                             group:'draw'
                             on_press:root.getLineType('left')
                             text:'blue line'
+                        ToggleButton
+                            id:sfline
+                            group:'draw'
+                            on_press:root.getLineType('sf')
+                            text:'sf line'
+                        ToggleButton
+                            id:haline
+                            group:'draw'
+                            on_press:root.getLineType('ha')
+                            text:'ha line'
 
                         Button
                             id:clearred
                             text: 'Clear Red Line'
                             on_press: root.clearRedLine()
-
                         Button
                             id:clearblue
                             text: 'Clear Blue Line'
                             on_press: root.clearBlueLine() # method that clears the blue lines
+                        Button
+                            id:clearsf
+                            text: 'Clear SF Line'
+                            on_press: root.clearSFLine()
+                        Button
+                            id:clearha
+                            text: 'Clear HA Line'
+                            on_press: root.clearHALine()
+
                 AccordionItem:
                     title:'Draw Symbols'
                     Controller:
