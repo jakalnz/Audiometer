@@ -7,5 +7,5 @@ Planned Features:
 
 Fast input
 Easy electronic export - pdf,csv,db
-Web and Mobile
+Mobile and PC
 
