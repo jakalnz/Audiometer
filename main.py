@@ -8,6 +8,7 @@ TO DO:
         a custom widget textinput and small label which shows elevated symbol or just type NR which is easier
     4. Report
     5. Geolocation https://github.com/geopy/geopy
+    6. SF and Aided, maybe add a float layou into the button with a second clear canvas to whic i can add the new icons
     '''
 
 
@@ -48,7 +49,6 @@ class NavigationBar(ActionBar):
 
 class PatientScreen(Screen):
     patientInput = ObjectProperty()
-
     pass
 
 
@@ -58,11 +58,6 @@ class AudioScreen(Screen):
     drawlineDrawer = ObjectProperty()
     patientLabel = ObjectProperty()
     control = ObjectProperty()
-    # patientLabel.text = App.get_running_app().patientdetails
-    # patientLabelText = StringProperty()
-
-
-
 
     def searchAndDestroy(self, akey, alist):
         for dict_element in alist:
@@ -79,6 +74,12 @@ class AudioScreen(Screen):
     def clearBlueLine(self):
         App.get_running_app().linesDictList = self.searchAndDestroy('blueline', App.get_running_app().linesDictList)
 
+    def clearSFLine(self):
+        App.get_running_app().linesDictList = self.searchAndDestroy('sfline', App.get_running_app().linesDictList)
+
+    def clearHALine(self):
+        App.get_running_app().linesDictList = self.searchAndDestroy('haline', App.get_running_app().linesDictList)
+
     pass
 
 
@@ -93,7 +94,6 @@ class ImmittanceScreen(Screen):
     tympImage = ObjectProperty()
     tympData = ObjectProperty()
     reflexImage = ObjectProperty()
-
     pass
 
 
@@ -136,8 +136,30 @@ class ReportScreen(Screen):
         pdf.image('tmp/reflex.png', x=80, y=150, w=60, h=50)
 
         pdf.output('test.pdf', 'F')
-
     pass
+
+
+def reCodeStringToButtonSF(currentSymbol):
+    index = 'SF'
+    value = [0, 0]
+
+    if currentSymbol[0] == 'sf':
+        index = 'SF'
+        if currentSymbol[1] == '--':
+            value = [1, currentSymbol[2]]  # [threshold, note]
+        elif currentSymbol[1] == 'nr':
+            value = [3, currentSymbol[2]]  # [no response, note]
+    if currentSymbol[3] == 'ha':
+        print 'got here'
+        index = 'HA'
+        if currentSymbol[4] == '--':
+            value = [1, currentSymbol[5]]  # [threshold, note]
+        elif currentSymbol[4] == 'nr':
+            value = [3, currentSymbol[5]]  # [no response, note]
+
+    output = [index, value]
+    return output
+
 
 
 def reCodeStringToButton(currentSymbol):
@@ -174,7 +196,6 @@ def reCodeStringToButton(currentSymbol):
             value = [4, currentSymbol[7]]
 
     output = [index, value]
-
     return output
 
 
@@ -204,6 +225,24 @@ def ButtonDictToString(value):
     return [RBCcode, ACcode, LBCcode]
 
 
+def ButtonSFDictToString(value):
+    #  reads input (ButtonDict) and returns a list of strings in the format:[SFHAcode]
+    string_dict = {}
+
+    start_key = {'SF': 'sf', 'HA': 'ha'}
+    symbol_key = {0: '--', 1: '--', 3: 'nr'}  # no masking for SF
+
+    for key in value:
+        # determine if value is 0 and then put '--' in string
+        if value[key][0] == 0:
+            string_dict[key] = '--' + symbol_key[value[key][0]]
+        else:
+            string_dict[key] = start_key[key] + symbol_key[value[key][0]]
+
+    SFHAcode = string_dict['SF'] + str(value['SF'][1]) + string_dict['HA'] + str(value['HA'][1])
+
+    return SFHAcode
+
 # buttons create
 class AudioButton(Button):
     level = NumericProperty(0)
@@ -211,76 +250,33 @@ class AudioButton(Button):
     airconduction = ObjectProperty(None)
     rightboneconduction = ObjectProperty(None)
     leftboneconduction = ObjectProperty(None)
+    sflayout = ObjectProperty(None)
     mipmap = True
 
     # dictionary that stores contents, numeric values = [0-empty, 1-threshold, 2-maskedthreshold 3-threshnoresp, 4maskenoresp],[ 0-no note,1-note1, 2-note2, 3-note3]]
     contents = DictProperty({'LAC': [0, 0], 'RAC': [0, 0], 'LBC': [0, 0], 'RBC': [0, 0]})
+    sfcontents = DictProperty({'SF': [0, 0], 'HA': [0, 0]})
 
     # create a method that on click reports position of button, gives level, gets frequencycolumn label
     def changeImage(self):
-        currentSymbol = App.get_running_app().controllerOutput
+
+        if App.get_running_app().symbolType is 'nonSF':
+            currentSymbol = App.get_running_app().controllerOutput
+        else:
+            currentSymbol = App.get_running_app().controllerSFOutput
         print currentSymbol
 
-
-        # adds the symbol to the Button dictProperty "contents"
-        # print reCodeStringToButton(currentSymbol)
-        new_content_list = reCodeStringToButton(currentSymbol)
-        print 'this is the content list: '
-        print new_content_list
-        self.contents[new_content_list[0]] = new_content_list[1]
-
-        # decode contents
-        symbolList = ButtonDictToString(self.contents)
-        print 'this is the symbolList: '
-        print symbolList
-
-        self.airconduction.source = 'Images/' + symbolList[1] + '.png'
-
-        # only do BC for BC frequencies alternatively could have a second method for intermediate freq
-        if self.parent.parent.frequencyLabel in ['125', '250', '500', '1000', '2000', '4000']:
-            self.rightboneconduction.source = 'Images/' + symbolList[0] + '.png'
-            self.leftboneconduction.source = 'Images/' + symbolList[2] + '.png'
-
-
-        print self.text  # references the level,
-        print self.parent.parent.frequencyLabel  # references the frequency
-
-
-        return
-
-
-
-    def on_touch_down(self, touch):
-        if (self.collide_point(*touch.pos) and touch.is_double_tap == False
-            and self.parent.parent.parent.parent.parent.parent.parent.ids.drawlineDrawer.collapse == False):
-            # that is a long parent string isn't it!
-            with self.parent.parent.parent.canvas:
-                # logic to change initial colour and line
-                if App.get_running_app().lineType == 'right':
-                    Color(1, 0, 0, 1)
-                    touch.ud['redline'] = Line(points=(self.center_x, self.center_y))
-                elif App.get_running_app().lineType == 'left':
-                    Color(0, 0, 1, 1)
-                    touch.ud['blueline'] = Line(points=(self.center_x, self.center_y), dash_offset=5)
-                # adds the touch to the line Dict List
-                App.get_running_app().linesDictList.append(touch.ud)
-
-        elif self.collide_point(*touch.pos) and not touch.is_double_tap:
-            super(AudioButton, self).on_touch_down(touch)
-            # print self.text  # references the level,
-            # print self.parent.parent.frequencyLabel  #
-            # print self.parent.parent.parent.parent.ids
-            #
-            # print '-' * 10
-            # print self.parent.parent.parent.parent.ids['audiogramW'].ids
-
-        #     double tap
-        if self.collide_point(*touch.pos) and touch.is_double_tap:
-            currentSymbol = App.get_running_app().controllerOutput
-            print currentSymbol
+        if App.get_running_app().symbolType is 'nonSF':
+            # adds the symbol to the Button dictProperty "contents"
             new_content_list = reCodeStringToButton(currentSymbol)
-            self.contents[new_content_list[0]] = [0, 0]  # removes item from list
-            symbolList = ButtonDictToString(self.contents)  # this is the
+            print 'this is the content list: '
+            print new_content_list
+            self.contents[new_content_list[0]] = new_content_list[1]
+
+            # decode contents
+            symbolList = ButtonDictToString(self.contents)
+            print 'this is the symbolList: '
+            print symbolList
 
             self.airconduction.source = 'Images/' + symbolList[1] + '.png'
 
@@ -288,37 +284,101 @@ class AudioButton(Button):
             if self.parent.parent.frequencyLabel in ['125', '250', '500', '1000', '2000', '4000']:
                 self.rightboneconduction.source = 'Images/' + symbolList[0] + '.png'
                 self.leftboneconduction.source = 'Images/' + symbolList[2] + '.png'
-            #self.airconduction.source = 'Icons\EMPTY.png'
-            print "popped"  # will need to implement a time delay
+
+        # for SF inputs...
+        if App.get_running_app().symbolType is 'SF':
+            new_content_list = reCodeStringToButtonSF(currentSymbol)
+            print 'this is the SF content list: '
+            print new_content_list
+            self.sfcontents[new_content_list[0]] = new_content_list[1]
+            symbolList = ButtonSFDictToString(self.sfcontents)
+            print 'this is the symbolList: '
+            print symbolList
+            self.sflayout.source = 'Images/' + symbolList + '.png'
+            # self.sflayout.source = 'Icons/' + 'SF' + '.png'
+
+        # report which button was pressed
+        print self.text  # references the level,
+        print self.parent.parent.frequencyLabel  # references the frequency
+
+        return
+
+
+
+    def on_touch_down(self, touch):
+
+        # are we drawing lines?
+        if (self.collide_point(*touch.pos) and touch.is_double_tap is False
+            and self.parent.parent.parent.parent.parent.parent.parent.ids.drawlineDrawer.collapse is False):
+            # that is a long parent string isn't it!
+            with self.parent.parent.parent.canvas:
+                # logic to change initial colour and line
+                if App.get_running_app().lineType == 'right':
+                    Color(1, 0, 0, 1)
+                    touch.ud['redline'] = Line(points=(self.center_x, self.center_y), width=1.1)
+                elif App.get_running_app().lineType == 'left':
+                    Color(0, 0, 1, 1)
+                    touch.ud['blueline'] = Line(points=(self.center_x, self.center_y), dash_offset=5, width=1.1)
+                elif App.get_running_app().lineType == 'sf':
+                    Color(0.2, 0.2, 0.2, 1)
+                    touch.ud['sfline'] = Line(points=(self.center_x, self.center_y), dash_offset=5, width=1.1)
+                elif App.get_running_app().lineType == 'ha':
+                    Color(0.4, 0.4, 0.4, 1)
+                    touch.ud['haline'] = Line(points=(self.center_x, self.center_y), dash_offset=5, width=1.1)
+
+                # adds the touch to the line Dict List
+                App.get_running_app().linesDictList.append(touch.ud)
+
+        # are we placing symbols?
+        elif self.collide_point(*touch.pos) and not touch.is_double_tap:
+            super(AudioButton, self).on_touch_down(touch)
+
+        # are we doing a double tap
+        if self.collide_point(*touch.pos) and touch.is_double_tap:
+            if App.get_running_app().symbolType is 'nonSF':
+                current_symbol = App.get_running_app().controllerOutput
+                print current_symbol
+                new_content_list = reCodeStringToButton(current_symbol)
+                self.contents[new_content_list[0]] = [0, 0]  # removes item from list
+                symbol_list = ButtonDictToString(self.contents)  # this is the
+
+                self.airconduction.source = 'Images/' + symbol_list[1] + '.png'
+
+                # only do BC for BC frequencies alternatively could have a second method for intermediate freq
+                if self.parent.parent.frequencyLabel in ['125', '250', '500', '1000', '2000', '4000']:
+                    self.rightboneconduction.source = 'Images/' + symbol_list[0] + '.png'
+                    self.leftboneconduction.source = 'Images/' + symbol_list[2] + '.png'
+
+            if App.get_running_app().symbolType is 'SF':
+                current_symbol = App.get_running_app().controllerSFOutput
+                print current_symbol
+                new_content_list = reCodeStringToButtonSF(current_symbol)
+                self.sfcontents[new_content_list[0]] = [0, 0]
+                symbol_list = ButtonSFDictToString(self.sfcontents)
+                self.sflayout.source = 'Images/' + symbol_list + '.png'
+
+            print "popped"
         return
 
     def on_touch_move(self, touch):
-        if (self.parent.parent.parent.parent.parent.parent.parent.ids.drawlineDrawer.collapse == False
+        if (self.parent.parent.parent.parent.parent.parent.parent.ids.drawlineDrawer.collapse is False
             and self.collide_point(*touch.pos)):
 
-            # add logic to change line colour if NR to clear
             if App.get_running_app().lineType == 'right':
                 if self.contents['RAC'][0] != 0:
                     touch.ud['redline'].points += [self.airconduction.center_x, self.center_y]
-                    # add logic to change the colour in here
 
             if App.get_running_app().lineType == 'left':
                 if self.contents['LAC'][0] != 0:
-                    # if self.contents['LAC'][0] == 3 or 4: # if values have NR then make pen clear
-
-                    # touch.ud['blueline'].width = 0.0
                     touch.ud['blueline'].points += [self.airconduction.center_x, self.center_y]
-                    # add logic to change the colour in here
 
-                    # print self.ids
+            if App.get_running_app().lineType == 'sf':
+                if self.sfcontents['SF'][0] != 0:
+                    touch.ud['sfline'].points += [self.sflayout.center_x, self.center_y]
 
-                    # touch.ud['line'].points += [touch.x, touch.y]
-
-                    # def on_touch_up(self, touch):
-                    #     if (self.parent.parent.parent.parent.parent.parent.parent.parent.ids.drawlineDrawer.collapse == False
-                    #         and self.collide_point(*touch.pos)):
-                    #         print str(self.text) + ' * ' + str(self.parent.parent.frequencyLabel) + ' was lifted'
-                    #         touch.ud['line'].points += [self.airconduction.center_x, self.center_y]
+            if App.get_running_app().lineType == 'ha':
+                if self.sfcontents['HA'][0] != 0:
+                    touch.ud['haline'].points += [self.sflayout.center_x, self.center_y]
 
 
 class FrequencyColumn(Widget):
@@ -487,9 +547,14 @@ class Controller(Widget):
     mipmap = True
 
     def getControllerInput(self, symbol):
-        # reinit the list on button press - but keep notes and NR
+        # reinit the list on button press - but keep notes
         App.get_running_app().controllerOutput[0:3] = ['--', '-', '--']
         App.get_running_app().controllerOutput[4:7] = ['--', '-', '--']
+        # create a seperate list for SF thresholds
+        App.get_running_app().controllerSFOutput[0:2] = ['--', '--']
+        App.get_running_app().controllerSFOutput[3:5] = ['--', '--']
+        # default symbolType to non-SF
+        App.get_running_app().symbolType = 'nonSF'
         # assign values to list
         if symbol == 'ra-':
             App.get_running_app().controllerOutput[0] = 'ra'
@@ -515,16 +580,20 @@ class Controller(Widget):
         elif symbol == 'lbm':
             App.get_running_app().controllerOutput[4] = 'lb'
             App.get_running_app().controllerOutput[5] = 'm'
+        elif symbol == 'sf-':
+            App.get_running_app().controllerSFOutput[0] = 'sf'
+            App.get_running_app().symbolType = 'SF'
+        elif symbol == 'ha-':
+            App.get_running_app().controllerSFOutput[3] = 'ha'
+            App.get_running_app().symbolType = 'SF'
 
-        # self.ids.nr.getControllerNR(self.ids.nr.getControllerNR.state)
         # reset notes and NR widgets on new item select
         self.ids.controllerNR.state = 'normal'
         self.ids.controllerNote.text = 'No Note'
-        # App.get_running_app().symbolType = symbol
-        # print(App.get_running_app().symbolType)
-        print(App.get_running_app().controllerOutput)
 
-        # will need to change this so I'm inputting to a list property at a certain position but yay!
+        print(App.get_running_app().controllerOutput)
+        print(App.get_running_app().controllerSFOutput)
+
 
     def getControllerNote(self, note):
 
@@ -532,6 +601,9 @@ class Controller(Widget):
         App.get_running_app().controllerOutput[3] = '0'
         App.get_running_app().controllerOutput[7] = '0'
 
+        App.get_running_app().controllerSFOutput[2] = '0'
+        App.get_running_app().controllerSFOutput[5] = '0'
+        if App.get_running_app().controllerOutput[0] != '--' or App.get_running_app().controllerOutput[4] != '--':
         # set pos of list to be relapced based on l or r input
         if App.get_running_app().controllerOutput[0] != '--':
             pos = 3
@@ -552,6 +624,26 @@ class Controller(Widget):
             print 'Note1'
 
         print App.get_running_app().controllerOutput
+        print App.get_running_app().controllerSFOutput
+
+        # for SF
+        if App.get_running_app().controllerSFOutput[0] != '--' or App.get_running_app().controllerSFOutput[3] != '--':
+            if App.get_running_app().controllerSFOutput[0] != '--':
+                pos = 2
+            else:
+                pos = 5
+            if note == 'No Note':
+                App.get_running_app().controllerSFOutput[pos] = '0'
+                print 'Note0'
+            elif note == 'Note 1':
+                App.get_running_app().controllerSFOutput[pos] = '1'
+                print 'Note1'
+            elif note == 'Note 2':
+                App.get_running_app().controllerSFOutput[pos] = '2'
+                print 'Note2'
+            elif note == 'Note 3':
+                App.get_running_app().controllerSFOutput[pos] = '3'
+                print 'Note1'
 
     def getControllerNR(self, state):
         # Note NR state resets when the getControllerInput method is called
@@ -559,6 +651,10 @@ class Controller(Widget):
         if state == 'normal':
             App.get_running_app().controllerOutput[2] = '--'
             App.get_running_app().controllerOutput[6] = '--'
+
+            App.get_running_app().controllerSFOutput[1] = '--'
+            App.get_running_app().controllerSFOutput[4] = '--'
+
         if state == 'down':
             no_response_text = 'nr'
 
@@ -569,31 +665,26 @@ class Controller(Widget):
             App.get_running_app().controllerOutput[6] = no_response_text
             App.get_running_app().controllerOutput[2] = '--'
 
-            # print App.get_running_app().controllerOutput
-
-            #print(state)
-
-        # get input from widgets and pass to the audiogram button widgets
-
-
+        if App.get_running_app().controllerSFOutput[0] != '--':
+            App.get_running_app().controllerSFOutput[1] = no_response_text
+            App.get_running_app().controllerSFOutput[4] = '--'
+        if App.get_running_app().controllerSFOutput[3] != '--':
+            App.get_running_app().controllerSFOutput[4] = no_response_text
+            App.get_running_app().controllerSFOutput[1] = '--'
 
 
 class DrawAudioApp(App):
     symbolType = StringProperty()
     controllerOutput = ListProperty(['--', '-', '--', '0', '--', '-', '--', '0'])
+    controllerSFOutput = ListProperty(
+        ['--', '--', '0', '--', '--', '0'])  # list def: ['sf', 'nr', '0', 'ha', 'nr', '0']
     lineType = StringProperty()
     clearRed = ObjectProperty()
     clearBlue = ObjectProperty()
     linesDictList = ListProperty()
 
-
-
-
-
     def build(self):
         return
-
-
 
 if __name__ == '__main__':
     DrawAudioApp().run()
