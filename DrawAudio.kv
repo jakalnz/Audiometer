@@ -791,7 +791,9 @@
                         size:self.size
                         pos:self.pos
                         source:'Icons/SF.png'
+
                 on_press:root.getControllerInput('sf-')
+                mipmap: self.parent.parent.parent.mipmap
             Label:
             ToggleButton:
                 id:ad-
@@ -800,8 +802,9 @@
                     Rectangle:
                         size:self.size
                         pos:self.pos
-                        source:'Icons/Aided.png'
+                        source:'Icons/HA.png'
                 on_press:root.getControllerInput('ha-')
+                mipmap: self.parent.parent.parent.mipmap
 
 
             Label:

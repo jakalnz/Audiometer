@@ -143,11 +143,12 @@ def reCodeStringToButtonSF(currentSymbol):
             value = [1, currentSymbol[2]]  # [threshold, note]
         elif currentSymbol[1] == 'nr':
             value = [3, currentSymbol[2]]  # [no response, note]
-    elif currentSymbol[3] == 'ha':
+    if currentSymbol[3] == 'ha':
+        print 'got here'
         index = 'HA'
         if currentSymbol[4] == '--':
             value = [1, currentSymbol[5]]  # [threshold, note]
-        elif currentSymbol[1] == 'nr':
+        elif currentSymbol[4] == 'nr':
             value = [3, currentSymbol[5]]  # [no response, note]
 
     output = [index, value]
@@ -287,8 +288,8 @@ class AudioButton(Button):
             symbolList = ButtonSFDictToString(self.sfcontents)
             print 'this is the symbolList: '
             print symbolList
-            # self.sflayout.source = 'Images/' + symbolList[1] + '.png'
-            self.sflayout.source = 'Icons/' + 'SF' + '.png'
+            self.sflayout.source = 'Images/' + symbolList + '.png'
+            # self.sflayout.source = 'Icons/' + 'SF' + '.png'
 
         # report which button was pressed
         print self.text  # references the level,
@@ -321,49 +322,42 @@ class AudioButton(Button):
 
         # are we doing a double tap
         if self.collide_point(*touch.pos) and touch.is_double_tap:
-            currentSymbol = App.get_running_app().controllerOutput
-            print currentSymbol
-            new_content_list = reCodeStringToButton(currentSymbol)
-            self.contents[new_content_list[0]] = [0, 0]  # removes item from list
-            symbolList = ButtonDictToString(self.contents)  # this is the
+            if App.get_running_app().symbolType is 'nonSF':
+                current_symbol = App.get_running_app().controllerOutput
+                print current_symbol
+                new_content_list = reCodeStringToButton(current_symbol)
+                self.contents[new_content_list[0]] = [0, 0]  # removes item from list
+                symbol_list = ButtonDictToString(self.contents)  # this is the
 
-            self.airconduction.source = 'Images/' + symbolList[1] + '.png'
+                self.airconduction.source = 'Images/' + symbol_list[1] + '.png'
 
-            # only do BC for BC frequencies alternatively could have a second method for intermediate freq
-            if self.parent.parent.frequencyLabel in ['125', '250', '500', '1000', '2000', '4000']:
-                self.rightboneconduction.source = 'Images/' + symbolList[0] + '.png'
-                self.leftboneconduction.source = 'Images/' + symbolList[2] + '.png'
-            #self.airconduction.source = 'Icons\EMPTY.png'
-            print "popped"  # will need to implement a time delay
+                # only do BC for BC frequencies alternatively could have a second method for intermediate freq
+                if self.parent.parent.frequencyLabel in ['125', '250', '500', '1000', '2000', '4000']:
+                    self.rightboneconduction.source = 'Images/' + symbol_list[0] + '.png'
+                    self.leftboneconduction.source = 'Images/' + symbol_list[2] + '.png'
+
+            if App.get_running_app().symbolType is 'SF':
+                current_symbol = App.get_running_app().controllerSFOutput
+                print current_symbol
+                new_content_list = reCodeStringToButtonSF(current_symbol)
+                self.sfcontents[new_content_list[0]] = [0, 0]
+                symbol_list = ButtonSFDictToString(self.sfcontents)
+                self.sflayout.source = 'Images/' + symbol_list + '.png'
+
+            print "popped"
         return
 
     def on_touch_move(self, touch):
         if (self.parent.parent.parent.parent.parent.parent.parent.ids.drawlineDrawer.collapse is False
             and self.collide_point(*touch.pos)):
 
-            # add logic to change line colour if NR to clear
             if App.get_running_app().lineType == 'right':
                 if self.contents['RAC'][0] != 0:
                     touch.ud['redline'].points += [self.airconduction.center_x, self.center_y]
-                    # add logic to change the colour in here
 
             if App.get_running_app().lineType == 'left':
                 if self.contents['LAC'][0] != 0:
-                    # if self.contents['LAC'][0] == 3 or 4: # if values have NR then make pen clear
-
-                    # touch.ud['blueline'].width = 0.0
                     touch.ud['blueline'].points += [self.airconduction.center_x, self.center_y]
-                    # add logic to change the colour in here
-
-                    # print self.ids
-
-                    # touch.ud['line'].points += [touch.x, touch.y]
-
-                    # def on_touch_up(self, touch):
-                    #     if (self.parent.parent.parent.parent.parent.parent.parent.parent.ids.drawlineDrawer.collapse == False
-                    #         and self.collide_point(*touch.pos)):
-                    #         print str(self.text) + ' * ' + str(self.parent.parent.frequencyLabel) + ' was lifted'
-                    #         touch.ud['line'].points += [self.airconduction.center_x, self.center_y]
 
 
 class FrequencyColumn(Widget):
@@ -662,20 +656,14 @@ class DrawAudioApp(App):
     symbolType = StringProperty()
     controllerOutput = ListProperty(['--', '-', '--', '0', '--', '-', '--', '0'])
     controllerSFOutput = ListProperty(
-        ['--', '--', '-', '--', '--', '-'])  # list def: ['sf', 'nr', '0', 'ha', 'nr', '0']
+        ['--', '--', '0', '--', '--', '0'])  # list def: ['sf', 'nr', '0', 'ha', 'nr', '0']
     lineType = StringProperty()
     clearRed = ObjectProperty()
     clearBlue = ObjectProperty()
     linesDictList = ListProperty()
 
-
-
-
-
     def build(self):
         return
-
-
 
 if __name__ == '__main__':
     DrawAudioApp().run()
