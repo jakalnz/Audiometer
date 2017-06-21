@@ -41,6 +41,31 @@ class NavigationBar(ActionBar):
         self.generateAudioChart()
         self.parent.parent.manager.get_screen('speech').speechAudioID.reload()
         self.parent.parent.manager.current = 'speech'
+
+    def changeWidget(self, selection):
+        if selection is 'sym':
+            print 'sym selected'
+            self.parent.parent.manager.get_screen('audio').drawlineDrawer.disabled = True
+            self.parent.parent.manager.get_screen('audio').drawlineDrawer.opacity = 0
+            # self.parent.parent.manager.get_screen('audio').drawlineDrawer.size_hint = (0, 0)
+            # self.parent.parent.manager.get_screen('audio').control.size_hint = (1, 1)
+            self.parent.parent.manager.get_screen('audio').control.opacity = 1
+            self.parent.parent.manager.get_screen('audio').control.disabled = False
+            self.parent.parent.manager.get_screen('audio').control.pos = (
+            self.parent.parent.manager.get_screen('audio').control.parent.pos)
+            App.get_running_app().audCtrlToggle = 'control'
+
+        if selection is 'lin':
+            print 'lin selected'
+
+            self.parent.parent.manager.get_screen('audio').control.opacity = 0
+            self.parent.parent.manager.get_screen('audio').control.disabled = True
+            self.parent.parent.manager.get_screen('audio').drawlineDrawer.disabled = False
+            self.parent.parent.manager.get_screen('audio').drawlineDrawer.opacity = 1
+            self.parent.parent.manager.get_screen('audio').control.pos = (-1000, 0)
+
+            # self.parent.parent.manager.get_screen('audio').drawlineDrawer.size_hint = (1, 1)
+            App.get_running_app().audCtrlToggle = 'draw lines'
     pass
 
 
@@ -59,26 +84,26 @@ class AudioScreen(Screen):
     patientLabel = ObjectProperty()
     control = ObjectProperty()
 
-    def searchAndDestroy(self, akey, alist):
-        for dict_element in alist:
-            if akey in dict_element:
-                dict_element[akey].points = []
-        return alist
-
-    def getLineType(self, input):
-        App.get_running_app().lineType = input
-
-    def clearRedLine(self):
-        App.get_running_app().linesDictList = self.searchAndDestroy('redline', App.get_running_app().linesDictList)
-
-    def clearBlueLine(self):
-        App.get_running_app().linesDictList = self.searchAndDestroy('blueline', App.get_running_app().linesDictList)
-
-    def clearSFLine(self):
-        App.get_running_app().linesDictList = self.searchAndDestroy('sfline', App.get_running_app().linesDictList)
-
-    def clearHALine(self):
-        App.get_running_app().linesDictList = self.searchAndDestroy('haline', App.get_running_app().linesDictList)
+    # def searchAndDestroy(self, akey, alist):
+    #     for dict_element in alist:
+    #         if akey in dict_element:
+    #             dict_element[akey].points = []
+    #     return alist
+    #
+    # def getLineType(self, input):
+    #     App.get_running_app().lineType = input
+    #
+    # def clearRedLine(self):
+    #     App.get_running_app().linesDictList = self.searchAndDestroy('redline', App.get_running_app().linesDictList)
+    #
+    # def clearBlueLine(self):
+    #     App.get_running_app().linesDictList = self.searchAndDestroy('blueline', App.get_running_app().linesDictList)
+    #
+    # def clearSFLine(self):
+    #     App.get_running_app().linesDictList = self.searchAndDestroy('sfline', App.get_running_app().linesDictList)
+    #
+    # def clearHALine(self):
+    #     App.get_running_app().linesDictList = self.searchAndDestroy('haline', App.get_running_app().linesDictList)
 
     pass
 
@@ -309,7 +334,8 @@ class AudioButton(Button):
 
         # are we drawing lines?
         if (self.collide_point(*touch.pos) and touch.is_double_tap is False
-            and self.parent.parent.parent.parent.parent.parent.parent.ids.drawlineDrawer.collapse is False):
+            and App.get_running_app().audCtrlToggle is not 'control'):  # self.parent.parent.parent.parent.parent.parent.parent.ids.drawlineDrawer.collapse is False):
+            print 'in drawing lines method'
             # that is a long parent string isn't it!
             with self.parent.parent.parent.canvas:
                 # logic to change initial colour and line
@@ -361,7 +387,7 @@ class AudioButton(Button):
         return
 
     def on_touch_move(self, touch):
-        if (self.parent.parent.parent.parent.parent.parent.parent.ids.drawlineDrawer.collapse is False
+        if (App.get_running_app().audCtrlToggle is not 'control'
             and self.collide_point(*touch.pos)):
 
             if App.get_running_app().lineType == 'right':
@@ -535,6 +561,32 @@ class RePop(Popup):
         super(RePop, self).__init__(**kwargs)
         print self.caller
 
+
+class LineDrawer(Widget):
+    drawLineDrawer = ObjectProperty()
+
+    def searchAndDestroy(self, akey, alist):
+        for dict_element in alist:
+            if akey in dict_element:
+                dict_element[akey].points = []
+        return alist
+
+    def getLineType(self, input):
+        App.get_running_app().lineType = input
+
+    def clearRedLine(self):
+        App.get_running_app().linesDictList = self.searchAndDestroy('redline', App.get_running_app().linesDictList)
+
+    def clearBlueLine(self):
+        App.get_running_app().linesDictList = self.searchAndDestroy('blueline', App.get_running_app().linesDictList)
+
+    def clearSFLine(self):
+        App.get_running_app().linesDictList = self.searchAndDestroy('sfline', App.get_running_app().linesDictList)
+
+    def clearHALine(self):
+        App.get_running_app().linesDictList = self.searchAndDestroy('haline', App.get_running_app().linesDictList)
+
+
 class Controller(Widget):
     # select symbols and modifiers, print, and save,load dialog, erase, clear and line markup
     controlID = ObjectProperty(None)
@@ -545,6 +597,10 @@ class Controller(Widget):
     test_type = ObjectProperty()
 
     mipmap = True
+
+    # opacity = 0
+    # disabled = True
+
 
     def getControllerInput(self, symbol):
         # reinit the list on button press - but keep notes
@@ -604,27 +660,28 @@ class Controller(Widget):
         App.get_running_app().controllerSFOutput[2] = '0'
         App.get_running_app().controllerSFOutput[5] = '0'
         if App.get_running_app().controllerOutput[0] != '--' or App.get_running_app().controllerOutput[4] != '--':
-        # set pos of list to be relapced based on l or r input
-        if App.get_running_app().controllerOutput[0] != '--':
-            pos = 3
-        else:
-            pos = 7
+            # set pos of list to be relapced based on l or r input
 
-        if note == 'No Note':
-            App.get_running_app().controllerOutput[pos] = '0'
-            print 'Note0'
-        elif note == 'Note 1':
-            App.get_running_app().controllerOutput[pos] = '1'
-            print 'Note1'
-        elif note == 'Note 2':
-            App.get_running_app().controllerOutput[pos] = '2'
-            print 'Note2'
-        elif note == 'Note 3':
-            App.get_running_app().controllerOutput[pos] = '3'
-            print 'Note1'
+            if App.get_running_app().controllerOutput[0] != '--':
+                pos = 3
+            else:
+                pos = 7
 
-        print App.get_running_app().controllerOutput
-        print App.get_running_app().controllerSFOutput
+            if note == 'No Note':
+                App.get_running_app().controllerOutput[pos] = '0'
+                print 'Note0'
+            elif note == 'Note 1':
+                App.get_running_app().controllerOutput[pos] = '1'
+                print 'Note1'
+            elif note == 'Note 2':
+                App.get_running_app().controllerOutput[pos] = '2'
+                print 'Note2'
+            elif note == 'Note 3':
+                App.get_running_app().controllerOutput[pos] = '3'
+                print 'Note1'
+
+            print App.get_running_app().controllerOutput
+            print App.get_running_app().controllerSFOutput
 
         # for SF
         if App.get_running_app().controllerSFOutput[0] != '--' or App.get_running_app().controllerSFOutput[3] != '--':
@@ -682,6 +739,7 @@ class DrawAudioApp(App):
     clearRed = ObjectProperty()
     clearBlue = ObjectProperty()
     linesDictList = ListProperty()
+    audCtrlToggle = StringProperty('control')
 
     def build(self):
         return

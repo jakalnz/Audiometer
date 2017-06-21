@@ -969,6 +969,52 @@
             text:'PTA'
             values:['PTA','CPA', 'VRA']
 
+<LineDrawer>:
+    id:drawLineDrawer
+    #title:'Mark Lines'
+
+    BoxLayout:
+        size:root.size
+        pos:root.pos
+        orientation:'vertical'
+        ToggleButton
+            id:redline
+            group:'draw'
+            on_press:root.getLineType('right')
+            text:'red line'
+        ToggleButton
+            id:blueline
+            group:'draw'
+            on_press:root.getLineType('left')
+            text:'blue line'
+        ToggleButton
+            id:sfline
+            group:'draw'
+            on_press:root.getLineType('sf')
+            text:'sf line'
+        ToggleButton
+            id:haline
+            group:'draw'
+            on_press:root.getLineType('ha')
+            text:'ha line'
+
+        Button
+            id:clearred
+            text: 'Clear Red Line'
+            on_press: root.clearRedLine()
+        Button
+            id:clearblue
+            text: 'Clear Blue Line'
+            on_press: root.clearBlueLine() # method that clears the blue lines
+        Button
+            id:clearsf
+            text: 'Clear SF Line'
+            on_press: root.clearSFLine()
+        Button
+            id:clearha
+            text: 'Clear HA Line'
+            on_press: root.clearHALine()
+
 <SpeechInput>:
     id:'default'
 
@@ -1395,6 +1441,16 @@ ScreenManager:
     #
     ActionView:
         ActionPrevious:
+
+        ActionToggleButton:
+            text:'Symbols'
+            group:'dyn'
+            on_press:root.changeWidget('sym')
+        ActionToggleButton:
+            text:'Lines'
+            group:'dyn'
+            on_press:root.changeWidget('lin')
+
         ActionButton:
             text:'Patient'
             on_press:root.parent.parent.manager.current = 'patient'
@@ -1460,59 +1516,21 @@ ScreenManager:
             AudiogramW:
                 id:currentAudioChart
 
-            Accordion:
+
+            FloatLayout:
+                pos:self.parent.pos
                 size_hint_x:.25
                 orientation:'vertical'
 
-
-                AccordionItem:
+                LineDrawer:
                     id:drawlineDrawer
-                    title:'Mark Lines'
+                    pos:self.parent.pos
+                    opacity:0
+                    disabled:True
 
-                    BoxLayout:
-                        orientation:'vertical'
-                        ToggleButton
-                            id:redline
-                            group:'draw'
-                            on_press:root.getLineType('right')
-                            text:'red line'
-                        ToggleButton
-                            id:blueline
-                            group:'draw'
-                            on_press:root.getLineType('left')
-                            text:'blue line'
-                        ToggleButton
-                            id:sfline
-                            group:'draw'
-                            on_press:root.getLineType('sf')
-                            text:'sf line'
-                        ToggleButton
-                            id:haline
-                            group:'draw'
-                            on_press:root.getLineType('ha')
-                            text:'ha line'
-
-                        Button
-                            id:clearred
-                            text: 'Clear Red Line'
-                            on_press: root.clearRedLine()
-                        Button
-                            id:clearblue
-                            text: 'Clear Blue Line'
-                            on_press: root.clearBlueLine() # method that clears the blue lines
-                        Button
-                            id:clearsf
-                            text: 'Clear SF Line'
-                            on_press: root.clearSFLine()
-                        Button
-                            id:clearha
-                            text: 'Clear HA Line'
-                            on_press: root.clearHALine()
-
-                AccordionItem:
-                    title:'Draw Symbols'
-                    Controller:
-                        id:control
+                Controller:
+                    id:control
+                    pos:self.parent.pos
         GridLayout:
             size_hint_y:.1
             pos:root.pos
