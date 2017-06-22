@@ -1434,41 +1434,107 @@ ScreenManager:
         id:report_screen
         name:'report'
 
-
-
-<NavigationBar>:
+<AudioNavigationBar>
     pos_hint: {'top':1}
-    #
+    currentview:currentview
+    #controlGroup:controlGroup
+    patientLabel:patientLabel
+    #linesButton:linesButton
+    #symbolButton:symbolButton
     ActionView:
+        id:currentview
+
         ActionPrevious:
 
+
+
+
         ActionToggleButton:
+            id:symbolButton
             text:'Symbols'
             group:'dyn'
             on_press:root.changeWidget('sym')
         ActionToggleButton:
+            id:linesButton
             text:'Lines'
             group:'dyn'
             on_press:root.changeWidget('lin')
 
+        ActionSeparator:
+
         ActionButton:
+            id:patientLabel
             text:'Patient'
-            on_press:root.parent.parent.manager.current = 'patient'
+            on_press:root.clearAudioControls(); root.parent.parent.manager.current = 'patient'
         ActionButton:
             text:'Audiogram'
-            on_press:root.parent.parent.manager.current = 'audio'
+            #on_press:root.parent.parent.manager.current = 'audio'
+            on_press:root.goToAudioScreen()
         ActionButton:
             text:'Speech'
             #on_press:root.parent.parent.manager.current = 'speech'
-            on_press:root.goToSpeechScreen()
+            on_press:root.clearAudioControls(); root.goToSpeechScreen()
         ActionButton:
             text:'Immittance'
-            on_press:root.parent.parent.manager.current = 'immittance'
+            on_press:root.clearAudioControls(); root.parent.parent.manager.current = 'immittance'
         ActionButton:
             text:'Report'
-            on_press:root.parent.parent.manager.current = 'report'
+            on_press:root.clearAudioControls(); root.parent.parent.manager.current = 'report'
+
+<NavigationBar>:
+    pos_hint: {'top':1}
+    currentview:currentview
+   # controlGroup:controlGroup
+    patientLabel:patientLabel
+    #linesButton:linesButton
+    #symbolButton:symbolButton
+    ActionView:
+        id:currentview
+
+        ActionPrevious:
 
 
+#        ActionGroup:
+#            id:currentview
+
+#            ActionToggleButton:
+#                id:symbolButton
+#                text:'Symbols'
+#                group:'dyn'
+#                on_press:root.changeWidget('sym')
+#            ActionToggleButton:
+#                id:linesButton
+#                text:'Lines'
+#                group:'dyn'
+#                on_press:root.changeWidget('lin')
+
+        ActionButton:
+            id:patientLabel
+            text:'Patient'
+            on_press:root.clearAudioControls(); root.parent.parent.manager.current = 'patient'
+        ActionButton:
+            text:'Audiogram'
+            #on_press:root.parent.parent.manager.current = 'audio'
+            on_press:root.goToAudioScreen()
+        ActionButton:
+            text:'Speech'
+            #on_press:root.parent.parent.manager.current = 'speech'
+            on_press:root.clearAudioControls(); root.goToSpeechScreen()
+        ActionButton:
+            text:'Immittance'
+            on_press:root.clearAudioControls(); root.parent.parent.manager.current = 'immittance'
+        ActionButton:
+            text:'Report'
+            on_press:root.clearAudioControls(); root.parent.parent.manager.current = 'report'
+
+
+<AudioControlSelect>:
+
+    ActionToggleButton:
+        text:'Place Symbols'
+        group:'choose'
+    ActionToggleButton:
+        text:'Draw Lines'
 
 <PatientScreen>:
     id:info
@@ -1499,7 +1565,7 @@ ScreenManager:
         size:root.size
         orientation:'vertical'
 
-        NavigationBar:
+        AudioNavigationBar:
             size_hint: (1., 0.1)
         Label:
             id:patientLabel

@@ -20,6 +20,7 @@ from kivy.app import App
 from kivy.graphics import Color, Line
 from kivy.properties import ObjectProperty, DictProperty, NumericProperty, StringProperty, ListProperty
 from kivy.uix.actionbar import ActionBar
+from kivy.uix.actionbar import ActionGroup
 from kivy.uix.button import Button
 from kivy.uix.dropdown import DropDown
 from kivy.uix.popup import Popup
@@ -30,12 +31,26 @@ get_indexes = lambda x, xs: [i for (y, i) in zip(xs, range(len(xs))) if x == y]
 
 
 # Make a Navigation Bar
+class AudioNavigationBar(ActionBar):
+    currentview = ObjectProperty()
+    controlGroup = ObjectProperty()
+    savedY = NumericProperty()
+    linesButton = ObjectProperty()
+    symbolButton = ObjectProperty()
+    patientLabel = ObjectProperty()
 
-
-class NavigationBar(ActionBar):
     def generateAudioChart(self):
         self.parent.parent.manager.get_screen('audio').currentAudioChart.export_to_png('tmp/audio.png')
         print 'in gen audio'
+
+    def goToAudioScreen(self):
+        self.parent.parent.manager.current = 'audio'
+
+    def clearAudioControls(self):
+        # if self.parent.parent.manager.current is 'audio':
+
+        # self.remove_widget(self.currentview)
+        pass
 
     def goToSpeechScreen(self):
         self.generateAudioChart()
@@ -52,7 +67,7 @@ class NavigationBar(ActionBar):
             self.parent.parent.manager.get_screen('audio').control.opacity = 1
             self.parent.parent.manager.get_screen('audio').control.disabled = False
             self.parent.parent.manager.get_screen('audio').control.pos = (
-            self.parent.parent.manager.get_screen('audio').control.parent.pos)
+                self.parent.parent.manager.get_screen('audio').control.parent.pos)
             App.get_running_app().audCtrlToggle = 'control'
 
         if selection is 'lin':
@@ -66,6 +81,64 @@ class NavigationBar(ActionBar):
 
             # self.parent.parent.manager.get_screen('audio').drawlineDrawer.size_hint = (1, 1)
             App.get_running_app().audCtrlToggle = 'draw lines'
+
+    pass
+
+
+class NavigationBar(ActionBar):
+    currentview = ObjectProperty()
+    controlGroup = ObjectProperty()
+    savedY = NumericProperty()
+    linesButton = ObjectProperty()
+    symbolButton = ObjectProperty()
+    patientLabel = ObjectProperty()
+
+    def generateAudioChart(self):
+        self.parent.parent.manager.get_screen('audio').currentAudioChart.export_to_png('tmp/audio.png')
+        print 'in gen audio'
+
+    def goToAudioScreen(self):
+        self.parent.parent.manager.current = 'audio'
+
+    def clearAudioControls(self):
+        # if self.parent.parent.manager.current is 'audio':
+        pass
+        # self.remove_widget(self.currentview)
+
+    def goToSpeechScreen(self):
+        self.generateAudioChart()
+        self.parent.parent.manager.get_screen('speech').speechAudioID.reload()
+        self.parent.parent.manager.current = 'speech'
+
+    def changeWidget(self, selection):
+        if selection is 'sym':
+            print 'sym selected'
+            self.parent.parent.manager.get_screen('audio').drawlineDrawer.disabled = True
+            self.parent.parent.manager.get_screen('audio').drawlineDrawer.opacity = 0
+            # self.parent.parent.manager.get_screen('audio').drawlineDrawer.size_hint = (0, 0)
+            # self.parent.parent.manager.get_screen('audio').control.size_hint = (1, 1)
+            self.parent.parent.manager.get_screen('audio').control.opacity = 1
+            self.parent.parent.manager.get_screen('audio').control.disabled = False
+            self.parent.parent.manager.get_screen('audio').control.pos = (
+                self.parent.parent.manager.get_screen('audio').control.parent.pos)
+            App.get_running_app().audCtrlToggle = 'control'
+
+        if selection is 'lin':
+            print 'lin selected'
+
+            self.parent.parent.manager.get_screen('audio').control.opacity = 0
+            self.parent.parent.manager.get_screen('audio').control.disabled = True
+            self.parent.parent.manager.get_screen('audio').drawlineDrawer.disabled = False
+            self.parent.parent.manager.get_screen('audio').drawlineDrawer.opacity = 1
+            self.parent.parent.manager.get_screen('audio').control.pos = (-1000, 0)
+
+            # self.parent.parent.manager.get_screen('audio').drawlineDrawer.size_hint = (1, 1)
+            App.get_running_app().audCtrlToggle = 'draw lines'
+
+    pass
+
+
+class AudioControlSelect(ActionGroup):
     pass
 
 
@@ -83,28 +156,6 @@ class AudioScreen(Screen):
     drawlineDrawer = ObjectProperty()
     patientLabel = ObjectProperty()
     control = ObjectProperty()
-
-    # def searchAndDestroy(self, akey, alist):
-    #     for dict_element in alist:
-    #         if akey in dict_element:
-    #             dict_element[akey].points = []
-    #     return alist
-    #
-    # def getLineType(self, input):
-    #     App.get_running_app().lineType = input
-    #
-    # def clearRedLine(self):
-    #     App.get_running_app().linesDictList = self.searchAndDestroy('redline', App.get_running_app().linesDictList)
-    #
-    # def clearBlueLine(self):
-    #     App.get_running_app().linesDictList = self.searchAndDestroy('blueline', App.get_running_app().linesDictList)
-    #
-    # def clearSFLine(self):
-    #     App.get_running_app().linesDictList = self.searchAndDestroy('sfline', App.get_running_app().linesDictList)
-    #
-    # def clearHALine(self):
-    #     App.get_running_app().linesDictList = self.searchAndDestroy('haline', App.get_running_app().linesDictList)
-
     pass
 
 
