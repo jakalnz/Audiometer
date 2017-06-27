@@ -1,4 +1,9 @@
-'''Draw Audiogram App'''
+'''
+Draw Audiogram App
+July 2017 by Mike Sanders
+'''
+
+
 '''
 TO DO:
     1. Add Technique for Audiometry - Std, CPA, VRA, 
@@ -11,6 +16,7 @@ TO DO:
     6. SF and Aided, maybe add a float layou into the button with a second clear canvas to whic i can add the new icons
     '''
 
+__version__ = '0.0.6'
 
 from itertools import izip as zip
 
@@ -20,6 +26,7 @@ from kivy.app import App
 from kivy.graphics import Color, Line
 from kivy.properties import ObjectProperty, DictProperty, NumericProperty, StringProperty, ListProperty
 from kivy.uix.actionbar import ActionBar
+from kivy.uix.actionbar import ActionGroup
 from kivy.uix.button import Button
 from kivy.uix.dropdown import DropDown
 from kivy.uix.popup import Popup
@@ -30,18 +37,83 @@ get_indexes = lambda x, xs: [i for (y, i) in zip(xs, range(len(xs))) if x == y]
 
 
 # Make a Navigation Bar
+class AudioNavigationBar(ActionBar):
+    currentview = ObjectProperty()
+    controlGroup = ObjectProperty()
+    savedY = NumericProperty()
+    linesButton = ObjectProperty()
+    symbolButton = ObjectProperty()
+    patientLabel = ObjectProperty()
+
+    def generateAudioChart(self):
+        # self.parent.parent.manager.get_screen('audio').currentAudioChart.export_to_png('tmp/audio.png')
+        print 'in gen audio'
+        sdpath = App.get_running_app().user_data_dir
+        self.parent.parent.manager.get_screen('audio').currentAudioChart.export_to_png(sdpath + '/audio.png')
+        # self.parent.parent.manager.get_screen('speech').speechAudioImage = sdpath + '/audio.png'
+        self.parent.parent.manager.get_screen('speech').speechAudioID.source = sdpath + '/audio.png'
+
+        print 'in gen audio'
+
+
+    def goToSpeechScreen(self):
+        # self.generateAudioChart()
+        # self.parent.parent.manager.get_screen('speech').speechAudioID.reload()
+        # self.parent.parent.manager.current = 'speech'
+
+        print 'in speechscreen'
+        self.generateAudioChart()
+        #self.parent.parent.manager.get_screen('speech').updateSpeechAudioImage()
+        self.parent.parent.manager.get_screen('speech').speechAudioID.reload()
+        self.parent.parent.manager.current = 'speech'
+
+
+    def changeWidget(self, selection):
+        if selection is 'sym':
+            print 'sym selected'
+            self.parent.parent.manager.get_screen('audio').drawlineDrawer.disabled = True
+            self.parent.parent.manager.get_screen('audio').drawlineDrawer.opacity = 0
+            self.parent.parent.manager.get_screen('audio').control.opacity = 1
+            self.parent.parent.manager.get_screen('audio').control.disabled = False
+            self.parent.parent.manager.get_screen('audio').control.pos = (
+                self.parent.parent.manager.get_screen('audio').control.parent.pos)
+            App.get_running_app().audCtrlToggle = 'control'
+
+        if selection is 'lin':
+            print 'lin selected'
+
+            self.parent.parent.manager.get_screen('audio').control.opacity = 0
+            self.parent.parent.manager.get_screen('audio').control.disabled = True
+            self.parent.parent.manager.get_screen('audio').drawlineDrawer.disabled = False
+            self.parent.parent.manager.get_screen('audio').drawlineDrawer.opacity = 1
+            self.parent.parent.manager.get_screen('audio').control.pos = (-1000, 0)
+
+            App.get_running_app().audCtrlToggle = 'draw lines'
+
+    pass
 
 
 class NavigationBar(ActionBar):
+
     def generateAudioChart(self):
-        self.parent.parent.manager.get_screen('audio').currentAudioChart.export_to_png('tmp/audio.png')
+        sdpath = App.get_running_app().user_data_dir
+        self.parent.parent.manager.get_screen('audio').currentAudioChart.export_to_png(sdpath + '/audio.png')
+        self.parent.parent.manager.get_screen('speech').speechAudioID.source = sdpath + '/audio.png'
         print 'in gen audio'
 
+    def goToAudioScreen(self):
+        self.parent.parent.manager.current = 'audio'
+
+
     def goToSpeechScreen(self):
+        print 'in speechscreen'
         self.generateAudioChart()
+        #self.parent.parent.manager.get_screen('speech').updateSpeechAudioImage()
+
         self.parent.parent.manager.get_screen('speech').speechAudioID.reload()
         self.parent.parent.manager.current = 'speech'
-    pass
+
+        print 'init'
 
 
 # Add the screens we need as subclasses
@@ -58,35 +130,23 @@ class AudioScreen(Screen):
     drawlineDrawer = ObjectProperty()
     patientLabel = ObjectProperty()
     control = ObjectProperty()
-
-    def searchAndDestroy(self, akey, alist):
-        for dict_element in alist:
-            if akey in dict_element:
-                dict_element[akey].points = []
-        return alist
-
-    def getLineType(self, input):
-        App.get_running_app().lineType = input
-
-    def clearRedLine(self):
-        App.get_running_app().linesDictList = self.searchAndDestroy('redline', App.get_running_app().linesDictList)
-
-    def clearBlueLine(self):
-        App.get_running_app().linesDictList = self.searchAndDestroy('blueline', App.get_running_app().linesDictList)
-
-    def clearSFLine(self):
-        App.get_running_app().linesDictList = self.searchAndDestroy('sfline', App.get_running_app().linesDictList)
-
-    def clearHALine(self):
-        App.get_running_app().linesDictList = self.searchAndDestroy('haline', App.get_running_app().linesDictList)
-
     pass
 
 
 class SpeechScreen(Screen):
+
     speechAudioImage = StringProperty()
     speechAudioImage = 'tmp/audio.png'
+    #speechAudioImage = 'tmp/audio.png'
     speechAudioID = ObjectProperty()
+    rightID = ObjectProperty()
+    leftID = ObjectProperty()
+
+    # def updateSpeechAudioImage(self):
+    #     print 'updating speechAudioImage'
+    #     self.speechAudioImage = App.get_running_app().user_data_dir + '/audio.png'
+    #     print self.speechAudioImage
+
     pass
 
 
@@ -99,13 +159,16 @@ class ImmittanceScreen(Screen):
 
 class ReportScreen(Screen):
     def save_audiogram(self):
-        self.manager.get_screen('audio').current_audiogram.export_to_png('testpng.png')
+        sdpath = App.get_running_app().user_data_dir
+        self.manager.get_screen('audio').current_audiogram.export_to_png(sdpath + '/audio.png')
 
     def makeAudiogramReportPDF(self):
         pdf = FPDF()
         pdf.add_page()
         pdf.set_font('Arial', 'B', 16)
         pdf.cell(40, 10, 'Audiometry Results')
+
+        sdpath = App.get_running_app().user_data_dir
 
         # get the patient information and put it into a cell
         name = self.manager.get_screen('patient').patientInput.patientName
@@ -125,17 +188,20 @@ class ReportScreen(Screen):
         print test_type
 
         #  insert the Audiogram Image
-        pdf.image('tmp/audio.png', x=10, y=20, w=130, h=100)
+        # self.manager.get_screen('audio').current_audiogram.export_to_png(sdpath + '/audio.png')
+        self.manager.get_screen('audio').currentAudioChart.export_to_png(sdpath + '/audio.png')
+        pdf.image(sdpath + '/audio.png', x=10, y=20, w=130, h=100)
 
         #  create tmp images
-        self.manager.get_screen('immittance').tympImage.tympDrawID.export_to_png('tmp/tymp.png')
-        self.manager.get_screen('immittance').reflexImage.export_to_png('tmp/reflex.png')
+        self.manager.get_screen('immittance').tympImage.tympDrawID.export_to_png(sdpath + '/tymp.png')
+        self.manager.get_screen('immittance').reflexImage.export_to_png(sdpath + '/reflex.png')
 
         # insert the other images
-        pdf.image('tmp/tymp.png', x=10, y=150, w=60, h=50)
-        pdf.image('tmp/reflex.png', x=80, y=150, w=60, h=50)
+        pdf.image(sdpath + '/tymp.png', x=10, y=150, w=60, h=50)
+        pdf.image(sdpath + '/reflex.png', x=80, y=150, w=60, h=50)
+        print sdpath
 
-        pdf.output('test.pdf', 'F')
+        pdf.output(sdpath + '/test.pdf', 'F')
     pass
 
 
@@ -244,6 +310,8 @@ def ButtonSFDictToString(value):
     return SFHAcode
 
 # buttons create
+
+
 class AudioButton(Button):
     level = NumericProperty(0)
     bLev = ObjectProperty(None)
@@ -309,7 +377,8 @@ class AudioButton(Button):
 
         # are we drawing lines?
         if (self.collide_point(*touch.pos) and touch.is_double_tap is False
-            and self.parent.parent.parent.parent.parent.parent.parent.ids.drawlineDrawer.collapse is False):
+            and App.get_running_app().audCtrlToggle is not 'control'):  # self.parent.parent.parent.parent.parent.parent.parent.ids.drawlineDrawer.collapse is False):
+            print 'in drawing lines method'
             # that is a long parent string isn't it!
             with self.parent.parent.parent.canvas:
                 # logic to change initial colour and line
@@ -361,7 +430,7 @@ class AudioButton(Button):
         return
 
     def on_touch_move(self, touch):
-        if (self.parent.parent.parent.parent.parent.parent.parent.ids.drawlineDrawer.collapse is False
+        if (App.get_running_app().audCtrlToggle is not 'control'
             and self.collide_point(*touch.pos)):
 
             if App.get_running_app().lineType == 'right':
@@ -428,6 +497,12 @@ class PatientDetails(Widget):
 
 class SpeechInput(Widget):
     speechInputID = ObjectProperty(None)
+    speechValuesListOfDict = ListProperty([{'Material': 'CVC', 'Type': 'SRT'}, {'Material': 'CVC', 'Type': 'SRT'},
+                                           {'Material': 'CVC', 'Type': 'SRT'}, {'Material': 'CVC', 'Type': 'SRT'}])
+
+
+
+
 
 
 class TympInput(Widget):
@@ -535,6 +610,32 @@ class RePop(Popup):
         super(RePop, self).__init__(**kwargs)
         print self.caller
 
+
+class LineDrawer(Widget):
+    drawLineDrawer = ObjectProperty()
+
+    def searchAndDestroy(self, akey, alist):
+        for dict_element in alist:
+            if akey in dict_element:
+                dict_element[akey].points = []
+        return alist
+
+    def getLineType(self, input):
+        App.get_running_app().lineType = input
+
+    def clearRedLine(self):
+        App.get_running_app().linesDictList = self.searchAndDestroy('redline', App.get_running_app().linesDictList)
+
+    def clearBlueLine(self):
+        App.get_running_app().linesDictList = self.searchAndDestroy('blueline', App.get_running_app().linesDictList)
+
+    def clearSFLine(self):
+        App.get_running_app().linesDictList = self.searchAndDestroy('sfline', App.get_running_app().linesDictList)
+
+    def clearHALine(self):
+        App.get_running_app().linesDictList = self.searchAndDestroy('haline', App.get_running_app().linesDictList)
+
+
 class Controller(Widget):
     # select symbols and modifiers, print, and save,load dialog, erase, clear and line markup
     controlID = ObjectProperty(None)
@@ -545,6 +646,10 @@ class Controller(Widget):
     test_type = ObjectProperty()
 
     mipmap = True
+
+    # opacity = 0
+    # disabled = True
+
 
     def getControllerInput(self, symbol):
         # reinit the list on button press - but keep notes
@@ -604,27 +709,28 @@ class Controller(Widget):
         App.get_running_app().controllerSFOutput[2] = '0'
         App.get_running_app().controllerSFOutput[5] = '0'
         if App.get_running_app().controllerOutput[0] != '--' or App.get_running_app().controllerOutput[4] != '--':
-        # set pos of list to be relapced based on l or r input
-        if App.get_running_app().controllerOutput[0] != '--':
-            pos = 3
-        else:
-            pos = 7
+            # set pos of list to be relapced based on l or r input
 
-        if note == 'No Note':
-            App.get_running_app().controllerOutput[pos] = '0'
-            print 'Note0'
-        elif note == 'Note 1':
-            App.get_running_app().controllerOutput[pos] = '1'
-            print 'Note1'
-        elif note == 'Note 2':
-            App.get_running_app().controllerOutput[pos] = '2'
-            print 'Note2'
-        elif note == 'Note 3':
-            App.get_running_app().controllerOutput[pos] = '3'
-            print 'Note1'
+            if App.get_running_app().controllerOutput[0] != '--':
+                pos = 3
+            else:
+                pos = 7
 
-        print App.get_running_app().controllerOutput
-        print App.get_running_app().controllerSFOutput
+            if note == 'No Note':
+                App.get_running_app().controllerOutput[pos] = '0'
+                print 'Note0'
+            elif note == 'Note 1':
+                App.get_running_app().controllerOutput[pos] = '1'
+                print 'Note1'
+            elif note == 'Note 2':
+                App.get_running_app().controllerOutput[pos] = '2'
+                print 'Note2'
+            elif note == 'Note 3':
+                App.get_running_app().controllerOutput[pos] = '3'
+                print 'Note1'
+
+            print App.get_running_app().controllerOutput
+            print App.get_running_app().controllerSFOutput
 
         # for SF
         if App.get_running_app().controllerSFOutput[0] != '--' or App.get_running_app().controllerSFOutput[3] != '--':
@@ -673,7 +779,7 @@ class Controller(Widget):
             App.get_running_app().controllerSFOutput[1] = '--'
 
 
-class DrawAudioApp(App):
+class drawaudioApp(App):
     symbolType = StringProperty()
     controllerOutput = ListProperty(['--', '-', '--', '0', '--', '-', '--', '0'])
     controllerSFOutput = ListProperty(
@@ -682,9 +788,10 @@ class DrawAudioApp(App):
     clearRed = ObjectProperty()
     clearBlue = ObjectProperty()
     linesDictList = ListProperty()
+    audCtrlToggle = StringProperty('control')
 
     def build(self):
         return
 
 if __name__ == '__main__':
-    DrawAudioApp().run()
+    drawaudioApp().run()
