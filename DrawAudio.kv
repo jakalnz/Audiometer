@@ -1039,59 +1039,83 @@
             Spinner:
                 text:'CVC'
                 values:['CVC','MLV','Spondee', 'HINT']
+                on_text:root.speechValuesListOfDict[0]['Material'] = self.text
             Spinner:
                 text:'SRT'
                 values:['SDT', 'SRT', 'WRT', 'MCL', 'UCL']
+                on_text:root.speechValuesListOfDict[0]['Type'] = self.text
             TextInput:
                 id:speech_level_1
+                on_text:root.speechValuesListOfDict[0]['Level'] = self.text
             TextInput:
                 id:speech_score_1
+                on_text:root.speechValuesListOfDict[0]['Score'] = self.text
             TextInput:
                 id:SNR
+                on_text:root.speechValuesListOfDict[0]['SNR'] = self.text
             CheckBox:
                 id:masked_speech_1
+                on_active:root.speechValuesListOfDict[0]['Masked'] = self.active
             Spinner:
                 text:'CVC'
                 values:['CVC','MLV','Spondee', 'HINT']
+                on_text:root.speechValuesListOfDict[1]['Material'] = self.text
             Spinner:
                 text:'SRT'
                 values:['SDT', 'SRT', 'WRT', 'MCL', 'UCL']
+                on_text:root.speechValuesListOfDict[1]['Type'] = self.text
             TextInput:
                 id:speech_level_2
+                on_text:root.speechValuesListOfDict[1]['Level'] = self.text
             TextInput:
                 id:speech_score_2
+                on_text:root.speechValuesListOfDict[1]['Score'] = self.text
             TextInput:
                 id:SNR
+                on_text:root.speechValuesListOfDict[1]['SNR'] = self.text
             CheckBox:
                 id:masked_speech_2
+                on_active:root.speechValuesListOfDict[1]['Masked'] = self.active
             Spinner:
                 text:'CVC'
                 values:['CVC','MLV','Spondee', 'HINT']
+                on_text:root.speechValuesListOfDict[2]['Material'] = self.text
             Spinner:
                 text:'SRT'
                 values:['SDT', 'SRT', 'WRT', 'MCL', 'UCL']
+                on_text:root.speechValuesListOfDict[2]['Type'] = self.text
             TextInput:
                 id:speech_level_3
+                on_text:root.speechValuesListOfDict[2]['Level'] = self.text
             TextInput:
                 id:speech_score_3
+                on_text:root.speechValuesListOfDict[2]['Score'] = self.text
             TextInput:
                 id:SNR
+                on_text:root.speechValuesListOfDict[2]['SNR'] = self.text
             CheckBox:
                 id:masked_speech_3
+                on_active:root.speechValuesListOfDict[2]['Masked'] = self.active
             Spinner:
                 text:'CVC'
                 values:['CVC','MLV','Spondee', 'HINT']
+                on_text:root.speechValuesListOfDict[3]['Material'] = self.text
             Spinner:
                 text:'SRT'
                 values:['SDT', 'SRT', 'WRT', 'MCL', 'UCL']
+                on_text:root.speechValuesListOfDict[3]['Type'] = self.text
             TextInput:
                 id:speech_level_4
+                on_text:root.speechValuesListOfDict[3]['Level'] = self.text
             TextInput:
                 id:speech_score_4
+                on_text:root.speechValuesListOfDict[3]['Score'] = self.text
             TextInput:
                 id:SNR
+                on_text:root.speechValuesListOfDict[3]['SNR'] = self.text
             CheckBox:
                 id:masked_speech_4
+                on_active:root.speechValuesListOfDict[3]['Masked'] = self.active
 
 <TympDrawCtrl>:
 
@@ -1451,12 +1475,12 @@ ScreenManager:
 
         ActionToggleButton:
             id:symbolButton
-            text:'Symbols'
+            text:'Draw Symbols'
             group:'dyn'
             on_press:root.changeWidget('sym')
         ActionToggleButton:
             id:linesButton
-            text:'Lines'
+            text:'Draw Lines'
             group:'dyn'
             on_press:root.changeWidget('lin')
 
@@ -1465,53 +1489,34 @@ ScreenManager:
         ActionButton:
             id:patientLabel
             text:'Patient'
-            on_press:root.clearAudioControls(); root.parent.parent.manager.current = 'patient'
+            on_press:root.parent.parent.manager.current = 'patient'
         ActionButton:
             text:'Audiogram'
-            #on_press:root.parent.parent.manager.current = 'audio'
-            on_press:root.goToAudioScreen()
+            on_press:root.parent.parent.manager.current = 'audio'
+
         ActionButton:
             text:'Speech'
             #on_press:root.parent.parent.manager.current = 'speech'
-            on_press:root.clearAudioControls(); root.goToSpeechScreen()
+            on_press:root.goToSpeechScreen()
         ActionButton:
             text:'Immittance'
-            on_press:root.clearAudioControls(); root.parent.parent.manager.current = 'immittance'
+            on_press:root.parent.parent.manager.current = 'immittance'
         ActionButton:
             text:'Report'
-            on_press:root.clearAudioControls(); root.parent.parent.manager.current = 'report'
+            on_press:root.parent.parent.manager.current = 'report'
 
 <NavigationBar>:
     pos_hint: {'top':1}
-    currentview:currentview
-   # controlGroup:controlGroup
-    patientLabel:patientLabel
-    #linesButton:linesButton
-    #symbolButton:symbolButton
+
     ActionView:
         id:currentview
 
         ActionPrevious:
 
-
-#        ActionGroup:
-#            id:currentview
-
-#            ActionToggleButton:
-#                id:symbolButton
-#                text:'Symbols'
-#                group:'dyn'
-#                on_press:root.changeWidget('sym')
-#            ActionToggleButton:
-#                id:linesButton
-#                text:'Lines'
-#                group:'dyn'
-#                on_press:root.changeWidget('lin')
-
         ActionButton:
             id:patientLabel
             text:'Patient'
-            on_press:root.clearAudioControls(); root.parent.parent.manager.current = 'patient'
+            on_press:root.parent.parent.manager.current = 'patient'
         ActionButton:
             text:'Audiogram'
             #on_press:root.parent.parent.manager.current = 'audio'
@@ -1519,22 +1524,16 @@ ScreenManager:
         ActionButton:
             text:'Speech'
             #on_press:root.parent.parent.manager.current = 'speech'
-            on_press:root.clearAudioControls(); root.goToSpeechScreen()
+            on_press:root.goToSpeechScreen()
         ActionButton:
             text:'Immittance'
-            on_press:root.clearAudioControls(); root.parent.parent.manager.current = 'immittance'
+            on_press:root.parent.parent.manager.current = 'immittance'
         ActionButton:
             text:'Report'
-            on_press:root.clearAudioControls(); root.parent.parent.manager.current = 'report'
+            on_press:root.parent.parent.manager.current = 'report'
 
 
-<AudioControlSelect>:
 
-    ActionToggleButton:
-        text:'Place Symbols'
-        group:'choose'
-    ActionToggleButton:
-        text:'Draw Lines'
 
 <PatientScreen>:
     id:info
@@ -1606,6 +1605,8 @@ ScreenManager:
 
 <SpeechScreen>:
     speechAudioID:speechAudioID
+    rightID:rightID
+    leftID:leftID
     #speechAudioImage:speechAudioImage
     BoxLayout:
         orientation:'vertical'
@@ -1623,6 +1624,8 @@ ScreenManager:
                 keep_ratio:False
             Label:
                 text:'Speech Graph here'
+                #RelativeLayout:
+
             Label:
 
                 canvas.before:
@@ -1644,10 +1647,10 @@ ScreenManager:
                 text:'Speech Left'
                 size_hint_y:0.1
             SpeechInput:
-                id:right
+                id:rightID
 
             SpeechInput:
-                id:left
+                id:leftID
 
 
 
