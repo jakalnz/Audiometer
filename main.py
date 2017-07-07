@@ -6,34 +6,56 @@ July 2017 by Mike Sanders
 
 '''
 TO DO:
-    1. Add Technique for Audiometry - Std, CPA, VRA, 
+    1. Change keyboard so that it keeps current window visible
     2. In Speech have Material [Spondee, CVC, HINT, MLV], Score Type [SDT, SRT,PRT,WRT, MCL, UCL], ?SNR, also comments section
-    3. Add images for ART
     3b. for ART input have popup widget with roulette (default 90 +5), select present or noreponse or cancel passes info to
         a custom widget textinput and small label which shows elevated symbol or just type NR which is easier
     4. Report
     5. Geolocation https://github.com/geopy/geopy
-    6. SF and Aided, maybe add a float layou into the button with a second clear canvas to whic i can add the new icons
+    6. SF and Aided, fix icons
     '''
 
 __version__ = '0.0.6'
 
+from bisect import bisect_left
 from itertools import izip as zip
 
 from fpdf import FPDF
 from kivy.app import App
+from kivy.core.window import Window
 # from kivy.garden.roulette import Roulette, CyclicRoulette
-from kivy.graphics import Color, Line
+from kivy.graphics import Color, Line, Point
 from kivy.properties import ObjectProperty, DictProperty, NumericProperty, StringProperty, ListProperty
 from kivy.uix.actionbar import ActionBar
-from kivy.uix.actionbar import ActionGroup
 from kivy.uix.button import Button
 from kivy.uix.dropdown import DropDown
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import Screen
 from kivy.uix.widget import Widget
 
+# Window.softinput_mode = 'pan'
+Window.softinput_mode = 'below_target'
+
 get_indexes = lambda x, xs: [i for (y, i) in zip(xs, range(len(xs))) if x == y]
+
+
+def takeClosest(myList, myNumber):
+    """
+    Assumes myList is sorted. Returns closest value to myNumber.
+
+    If two numbers are equally close, return the smallest number.
+    """
+    pos = bisect_left(myList, myNumber)
+    if pos == 0:
+        return myList[0]
+    if pos == len(myList):
+        return myList[-1]
+    before = myList[pos - 1]
+    after = myList[pos]
+    if after - myNumber < myNumber - before:
+        return after
+    else:
+        return before
 
 
 # Make a Navigation Bar
@@ -499,6 +521,105 @@ class SpeechInput(Widget):
     speechInputID = ObjectProperty(None)
     speechValuesListOfDict = ListProperty([{'Material': 'CVC', 'Type': 'SRT'}, {'Material': 'CVC', 'Type': 'SRT'},
                                            {'Material': 'CVC', 'Type': 'SRT'}, {'Material': 'CVC', 'Type': 'SRT'}])
+
+
+class SpeechGraph(Widget):
+    rightButtonID = ObjectProperty()
+    leftButtonID = ObjectProperty()
+    maskedToggleID = ObjectProperty()
+
+    def updateMasking(self):
+        if self.maskedToggleID.text == 'Unmasked':
+            self.maskedToggleID.text = 'Masked'
+        else:
+            self.maskedToggleID.text = 'Unmasked'
+
+
+class SpeechCanvas(Widget):
+    floatLayerID = ObjectProperty()
+
+    mipmap = True
+
+    def getX_hint_forLevel(self, level):
+        levels = range(-10, 111, 5)
+        origin_point = int(0.1 * self.width)
+        end_point = int(origin_point + (self.width - .2 * self.width))
+        axis_length = end_point - origin_point
+        new_x_points = range(origin_point, end_point + 1, int(axis_length / 24))
+        print new_x_points
+
+        print
+        # convert points to hints point/self.width
+
+        level_hints = [float(x) / self.width for x in new_x_points]
+        print level_hints
+
+        the_rel_coord = level_hints[levels.index(level)] * self.width
+
+        return int(the_rel_coord)
+
+    def getX(self, value):
+        origin_point = int(0.1 * self.width)
+        end_point = int(origin_point + (self.width - .2 * self.width))
+        axis_length = end_point - origin_point
+        new_x_points = range(origin_point, end_point + 1, int(axis_length / 24))
+        print new_x_points
+
+        new_x = takeClosest(new_x_points, value)
+        new_x = self.pos[0] + new_x
+        return new_x
+
+    def getY(self, value):
+        origin_point = (0.2 * self.height)
+        end_point = int(origin_point + (self.height - .3 * self.height))
+        axis_length = end_point - origin_point
+        new_y_points = range(int(origin_point), end_point + 1, int(axis_length / 10))
+        print new_y_points
+
+        new_y = takeClosest(new_y_points, value)
+        # print new_y
+        # new_y = self.pos[1]+new_y
+        return new_y
+
+    def on_touch_down(self, touch):
+        ud = touch.ud
+        ud['group'] = g = str(touch.uid)
+        print touch.ud
+        pointsize = 10
+        levels = range(-10, 111, 5)
+        # print levels
+        # self.getX()
+
+        # ret = super(..., self).on_touch_down(touch)
+
+
+
+
+        # are we drawing lines?
+        if (self.collide_point(*touch.pos) and touch.is_double_tap is False
+            and touch.y > (self.pos[1] + 0.05 * self.height)
+            and touch.x > (self.pos[0] + 0.1 * self.height)):
+            with self.canvas:
+                mipmap = True
+                print ("input touch coord:" + str(touch.pos))
+                # rel_touch = self.to_widget(touch.x,touch.y, True) # change coord to rel. coord
+                # print ("transformed touch coord:" + str(rel_touch))
+
+                # snap_x = self.getX(rel_touch[0])
+                # snap_y = self.getY(rel_touch[1])
+                snap_x = self.getX(touch.x)
+                snap_y = self.getY(touch.y)
+                print(snap_x, snap_y)
+                # print snap_x
+                # print snap_y
+
+
+
+                ud['lines'] = [Point(points=(snap_x, snap_y), source='Icons/RAC.png',
+                                     pointsize=pointsize, group=g, mipmap=True)]
+
+
+
 
 
 

@@ -683,9 +683,10 @@
                 TextInput:
                     id:dob_day
                     size_hint_x:0.2
-                    input_filter:'int'
                     write_tab: False
                     multiline: False
+                    input_filter:'int'
+                    on_focus: input_type = 'number'
                     on_text: root.updatePatientDOB(dd = self.text); root.addlabeltext()#root.patientDOB[0] = '    D.O.B.: ' + self.text
 
                 TextInput:
@@ -694,6 +695,7 @@
                     input_filter:'int'
                     write_tab: False
                     multiline: False
+                    on_focus: input_type = 'number'
                     on_text:  root.updatePatientDOB(mm = self.text); root.addlabeltext()#root.patientDOB[1] = '/' + self.text
                 TextInput:
                     id:dob_year
@@ -701,6 +703,7 @@
                     size_hint_x:0.6
                     write_tab: False
                     multiline: False
+                    on_focus: input_type = 'number'
                     on_text:  root.updatePatientDOB(yyyy = self.text); root.addlabeltext()#root.patientDOB[2] = '/' + self.text
 
             #GENDER INPUT
@@ -1047,12 +1050,24 @@
             TextInput:
                 id:speech_level_1
                 on_text:root.speechValuesListOfDict[0]['Level'] = self.text
+                write_tab: False
+                multiline: False
+                on_focus: input_type = 'number'
+                input_filter:'int'
             TextInput:
                 id:speech_score_1
                 on_text:root.speechValuesListOfDict[0]['Score'] = self.text
+                write_tab: False
+                multiline: False
+                on_focus: input_type = 'number'
+                input_filter:'int'
             TextInput:
                 id:SNR
                 on_text:root.speechValuesListOfDict[0]['SNR'] = self.text
+                write_tab: False
+                multiline: False
+                on_focus: input_type = 'number'
+                input_filter:'int'
             CheckBox:
                 id:masked_speech_1
                 on_active:root.speechValuesListOfDict[0]['Masked'] = self.active
@@ -1067,12 +1082,25 @@
             TextInput:
                 id:speech_level_2
                 on_text:root.speechValuesListOfDict[1]['Level'] = self.text
+                write_tab: False
+                multiline: False
+                on_focus: input_type = 'number'
+                input_filter:'int'
             TextInput:
                 id:speech_score_2
                 on_text:root.speechValuesListOfDict[1]['Score'] = self.text
+                write_tab: False
+                multiline: False
+                on_focus: input_type = 'number'
+                input_filter:'int'
             TextInput:
                 id:SNR
                 on_text:root.speechValuesListOfDict[1]['SNR'] = self.text
+                write_tab: False
+                multiline: False
+                on_focus: input_type = 'number'
+                input_filter:'int'
+
             CheckBox:
                 id:masked_speech_2
                 on_active:root.speechValuesListOfDict[1]['Masked'] = self.active
@@ -1087,12 +1115,24 @@
             TextInput:
                 id:speech_level_3
                 on_text:root.speechValuesListOfDict[2]['Level'] = self.text
+                write_tab: False
+                multiline: False
+                on_focus: input_type = 'number'
+                input_filter:'int'
             TextInput:
                 id:speech_score_3
                 on_text:root.speechValuesListOfDict[2]['Score'] = self.text
+                write_tab: False
+                multiline: False
+                on_focus: input_type = 'number'
+                input_filter:'int'
             TextInput:
                 id:SNR
                 on_text:root.speechValuesListOfDict[2]['SNR'] = self.text
+                write_tab: False
+                multiline: False
+                on_focus: input_type = 'number'
+                input_filter:'int'
             CheckBox:
                 id:masked_speech_3
                 on_active:root.speechValuesListOfDict[2]['Masked'] = self.active
@@ -1107,18 +1147,108 @@
             TextInput:
                 id:speech_level_4
                 on_text:root.speechValuesListOfDict[3]['Level'] = self.text
+                write_tab: False
+                multiline: False
+                on_focus: input_type = 'number'
+                input_filter:'int'
             TextInput:
                 id:speech_score_4
                 on_text:root.speechValuesListOfDict[3]['Score'] = self.text
+                write_tab: False
+                multiline: False
+                on_focus: input_type = 'number'
+                input_filter:'int'
             TextInput:
                 id:SNR
                 on_text:root.speechValuesListOfDict[3]['SNR'] = self.text
+                write_tab: False
+                multiline: False
+                on_focus: input_type = 'number'
+                input_filter:'int'
             CheckBox:
                 id:masked_speech_4
                 on_active:root.speechValuesListOfDict[3]['Masked'] = self.active
 
-<TympDrawCtrl>:
+<SpeechGraph>:
+    maskedToggleID:maskedToggleID
+    rightButtonID:rightButtonID
+    leftButtonID:leftButtonID
+    RelativeLayout:
+        size: root.size
+        pos: root.pos
+        SpeechCanvas:
+            id:canvasID
+            size_hint:(1,1)
+            pos_hint_y:0.1
 
+
+        Button:
+            id:rightButtonID
+            size_hint:(0.3333,.1)
+            pos:0,0
+            text: 'Right'
+            on_press: print('right')
+        Button:
+            id:leftButtonID
+            size_hint:(0.3333,.1)
+            pos:root.width/3,0
+            text: 'Left'
+            on_press: print('left')
+        Button:
+            id:maskedToggleID
+            size_hint:(0.3333,.1)
+            pos:2*root.width/3,0
+            text: 'Unmasked'
+            on_press: root.updateMasking()
+
+<SpeechCanvas>:
+    BoxLayout:
+        size: root.size
+        pos: root.pos
+        mipmap:root.mipmap
+        canvas.before:
+            Color:
+                rgb: 1,1,1
+            Rectangle:
+                #pos:self.pos[0],self.pos[1]
+                size:self.width,self.height
+            Color:
+                rgb:0,0,0
+            Rectangle:  # x-axis
+                size:self.width-.2*self.width,1
+                pos:0.1*self.width,0.2*self.height
+            Rectangle:  # y-axis
+                size:1,self.height-.3*self.height
+                pos:0.1*self.width,0.2*self.height
+            Rectangle: # 0dBHL
+                size:3,self.height-.3*self.height
+                pos:self.parent.getX_hint_forLevel(0)-1.5,0.2*self.height
+            Rectangle: # 20dBHL
+                size:1,self.height-.3*self.height
+                pos:self.parent.getX_hint_forLevel(20),0.2*self.height
+            Rectangle: # 40dBHL
+                size:1,self.height-.3*self.height
+                pos:self.parent.getX_hint_forLevel(40),0.2*self.height
+            Rectangle: # 600dBHL
+                size:1,self.height-.3*self.height
+                pos:self.parent.getX_hint_forLevel(60),0.2*self.height
+            Rectangle: # 800dBHL
+                size:1,self.height-.3*self.height
+                pos:self.parent.getX_hint_forLevel(80),0.2*self.height
+            Rectangle: # 100dBHL
+                size:1,self.height-.3*self.height
+                pos:self.parent.getX_hint_forLevel(100),0.2*self.height
+            Rectangle: # 120dBHL
+                size:1,self.height-.3*self.height
+                pos:self.parent.getX_hint_forLevel(110),0.2*self.height
+
+
+
+
+
+
+
+<TympDrawCtrl>:
     BoxLayout:
         size:root.size
         pos:root.pos
@@ -1194,6 +1324,8 @@
                     values:'','deep','shallow','high','low'
             TextInput:
                 id:r-MEP
+                #input_type:'number'
+                on_focus: input_type = 'number'
             Label:
                 text:'MEP\ndaPa'
             TextInput:
@@ -1622,9 +1754,8 @@ ScreenManager:
                 source: root.speechAudioImage
                 allow_stretch:True
                 keep_ratio:False
-            Label:
-                text:'Speech Graph here'
-                #RelativeLayout:
+            SpeechGraph:
+
 
             Label:
 
