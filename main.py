@@ -22,10 +22,11 @@ from itertools import izip as zip
 
 from fpdf import FPDF
 from kivy.app import App
+from kivy.clock import Clock
 from kivy.core.window import Window
 # from kivy.garden.roulette import Roulette, CyclicRoulette
 from kivy.graphics import Color, Line, Point
-from kivy.properties import ObjectProperty, DictProperty, NumericProperty, StringProperty, ListProperty
+from kivy.properties import ObjectProperty, DictProperty, NumericProperty, StringProperty, ListProperty, BooleanProperty
 from kivy.uix.actionbar import ActionBar
 from kivy.uix.button import Button
 from kivy.uix.dropdown import DropDown
@@ -537,15 +538,23 @@ class SpeechGraph(Widget):
 
 class SpeechCanvas(Widget):
     floatLayerID = ObjectProperty()
-
+    imagesList = ListProperty()
+    current_touch = None
+    double_tap = ListProperty()
+    is_double_tap = BooleanProperty(False)
     mipmap = True
+    tap_event = None
 
     def getX_hint_forLevel(self, level):
         levels = range(-10, 111, 5)
         origin_point = int(0.1 * self.width)
         end_point = int(origin_point + (self.width - .2 * self.width))
         axis_length = end_point - origin_point
-        new_x_points = range(origin_point, end_point + 1, int(axis_length / 24))
+
+        m = axis_length / 24
+
+        new_x_points = [origin_point + i * m for i in range(0, 25)]
+        # new_x_points = range(origin_point, end_point + 1, int(axis_length / 24))
         print new_x_points
 
         print
@@ -558,65 +567,140 @@ class SpeechCanvas(Widget):
 
         return int(the_rel_coord)
 
+    def getY_hint_forScore(self, score):
+        origin_point = (0.2 * self.height)
+        end_point = int(origin_point + (self.height - .3 * self.height))
+        axis_length = end_point - origin_point
+        m = axis_length / 100.0
+
+        output = origin_point + m * score
+
+        return output
+
     def getX(self, value):
         origin_point = int(0.1 * self.width)
         end_point = int(origin_point + (self.width - .2 * self.width))
         axis_length = end_point - origin_point
-        new_x_points = range(origin_point, end_point + 1, int(axis_length / 24))
-        print new_x_points
+        m = axis_length / 24
+
+        new_x_points = [origin_point + i * m for i in range(0, 25)]
+        # new_x_points = range(origin_point, end_point + 1, int(axis_length / 24))
+        print('new_x_points:' + str(new_x_points))
 
         new_x = takeClosest(new_x_points, value)
+
         new_x = self.pos[0] + new_x
         return new_x
 
     def getY(self, value):
         origin_point = (0.2 * self.height)
-        end_point = int(origin_point + (self.height - .3 * self.height))
+        end_point = (origin_point + (self.height - .3 * self.height))
         axis_length = end_point - origin_point
-        new_y_points = range(int(origin_point), end_point + 1, int(axis_length / 10))
+        m = axis_length / 100.00
+
+        # for create a for loop herre to replace the range
+        new_y_points = [origin_point + i * m for i in range(0, 101, 5)]
+        # new_y_points = range(int(origin_point), int(end_point) + 1, int(axis_length / 10))
         print new_y_points
 
         new_y = takeClosest(new_y_points, value)
-        # print new_y
-        # new_y = self.pos[1]+new_y
+
         return new_y
 
+    # def on_touch_up(self, touch):
+    #     if Clock.get_time() - touch.time_start > .300:
+    #         Clock.schedule_once(check, 0.3)
+    #         self.dtap = false
+
     def on_touch_down(self, touch):
+        self.double_tap = touch.pos
+        self.current_touch = touch
+
+        # if self.current_touch is not None:
+        if self.is_double_tap is True:
+            # Clock.unschedule(self.scheduled_func)
+            self.tap_event.cancel()
+            self.on_double_press(touch)
+            self.is_double_tap = False
+            # self.current_touch = None
+        else:
+            self.is_double_tap = True  # if singel press this is changed to false
+            # self.current_touch = touch
+            self.tap_event = Clock.schedule_once(self.on_single_press, 0.5)
+
+    def on_single_press(self, dt):
+        print('dt:' + str(dt))
+        touch = self.current_touch
         ud = touch.ud
         ud['group'] = g = str(touch.uid)
         print touch.ud
         pointsize = 10
-        levels = range(-10, 111, 5)
+        #levels = range(-10, 111, 5)
         # print levels
         # self.getX()
-
         # ret = super(..., self).on_touch_down(touch)
-
-
-
+        # print touch.pos
+        # print self.to_widget(touch.pos[0], touch.pos[1], True)
+        touch.pos = self.to_widget(touch.pos[0], touch.pos[1], True)
+        print touch.pos
+        # print self.pos
+        # print self.to_window(*self.pos)
+        # touch.x = touch.x - self.pos[0]
+        # touch.y = touch.y - self.pos[1]
 
         # are we drawing lines?
-        if (self.collide_point(*touch.pos) and touch.is_double_tap is False
+        # if (self.collide_point(*touch.pos) and touch.is_double_tap is False
+        if (self.collide_point(*touch.pos)
             and touch.y > (self.pos[1] + 0.05 * self.height)
             and touch.x > (self.pos[0] + 0.1 * self.height)):
             with self.canvas:
+
                 mipmap = True
-                print ("input touch coord:" + str(touch.pos))
-                # rel_touch = self.to_widget(touch.x,touch.y, True) # change coord to rel. coord
-                # print ("transformed touch coord:" + str(rel_touch))
-
-                # snap_x = self.getX(rel_touch[0])
-                # snap_y = self.getY(rel_touch[1])
-                snap_x = self.getX(touch.x)
-                snap_y = self.getY(touch.y)
+                # print ("input touch coord:" + str(touch.pos))
+                snap_x = self.getX(touch.pos[0])
+                snap_y = self.getY(touch.pos[1])
                 print(snap_x, snap_y)
-                # print snap_x
-                # print snap_y
 
-
+                # create a new tuple that contains the touch index and the ud
+                # {[x,y], type, ud} but maybe check how the audiogram does it
+                #self.imagesList.append([snap_x, snap_y, type, ])
 
                 ud['lines'] = [Point(points=(snap_x, snap_y), source='Icons/RAC.png',
                                      pointsize=pointsize, group=g, mipmap=True)]
+
+                self.imagesList.append([snap_x, snap_y, ud['lines']])  # creates a list of elements
+                print self.imagesList
+        # self.current_touch = None
+        self.is_double_tap = False
+        # print ud
+
+    def on_double_press(self, touch):
+        # if self.collide_point(*touch.pos) and touch.is_double_tap \
+        #         and touch.y > (self.pos[1] + 0.05 * self.height) \
+        #         and touch.x > (self.pos[0] + 0.1 * self.height):
+        if self.collide_point(*touch.pos) and touch.y > (self.pos[1] + 0.05 * self.height) \
+                and touch.x > (self.pos[0] + 0.1 * self.height):
+            snap_x = self.getX(touch.x)
+            snap_y = self.getY(touch.y)
+
+            self.erase_point(snap_x, snap_y, self.imagesList)
+
+            # self.current_touch = touch
+
+    def erase_point(self, x, y, obj_list):
+        print 'im out'
+        for item in obj_list:
+            if item[0] == x and item[1] == y:
+                print 'im in'
+                obj_list.remove(item)
+                # with self.canvas:
+                #     ud['lines'].remove(item[3])
+
+
+                #obj_list.del(item)
+
+
+
 
 
 

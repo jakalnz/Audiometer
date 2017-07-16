@@ -1220,6 +1220,7 @@
             Rectangle:  # y-axis
                 size:1,self.height-.3*self.height
                 pos:0.1*self.width,0.2*self.height
+
             Rectangle: # 0dBHL
                 size:3,self.height-.3*self.height
                 pos:self.parent.getX_hint_forLevel(0)-1.5,0.2*self.height
@@ -1242,8 +1243,21 @@
                 size:1,self.height-.3*self.height
                 pos:self.parent.getX_hint_forLevel(110),0.2*self.height
 
-
-
+            Rectangle:  # 20%
+                size:self.width-.2*self.width,1
+                pos:0.1*self.width,self.parent.getY_hint_forScore(20)
+            Rectangle:  # 40%
+                size:self.width-.2*self.width,1
+                pos:0.1*self.width,self.parent.getY_hint_forScore(40)
+            Rectangle:  # 60%
+                size:self.width-.2*self.width,1
+                pos:0.1*self.width,self.parent.getY_hint_forScore(60)
+            Rectangle:  # 80%
+                size:self.width-.2*self.width,1
+                pos:0.1*self.width,self.parent.getY_hint_forScore(80)
+            Rectangle:  # 100%
+                size:self.width-.2*self.width,1
+                pos:0.1*self.width,self.parent.getY_hint_forScore(100)
 
 
 
